@@ -48,7 +48,7 @@ public class mainGui {
 		
 		Button btnNetInfo = new Button(shlIprechner, SWT.NONE);
 		btnNetInfo.setBounds(100, 31, 250, 34);
-		btnNetInfo.setText("Netzwerkinformationen Berechnen");
+		btnNetInfo.setText("Netzwerkinformationen berechnen");
 		
 		Button btnVLSM = new Button(shlIprechner, SWT.NONE);
 		btnVLSM.setBounds(100, 71, 250, 34);
