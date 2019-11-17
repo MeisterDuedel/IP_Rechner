@@ -2,10 +2,11 @@ package IP_Rechner;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class mainGui {
 
@@ -52,6 +53,13 @@ public class mainGui {
 		lblBiteWhlenSie.setText("W\u00E4hlen Sie eine Aktion aus:");
 		
 		Button btnNetzwerkinformationenBerechnen = new Button(shlIpRechner, SWT.NONE);
+		btnNetzwerkinformationenBerechnen.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				NetzwerkinfosGui Infos = new NetzwerkinfosGui();
+				Infos.open();
+			}
+		});
 		btnNetzwerkinformationenBerechnen.setBounds(90, 32, 250, 25);
 		btnNetzwerkinformationenBerechnen.setText("Netzwerkinformationen berechnen");
 		
