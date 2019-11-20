@@ -1,13 +1,17 @@
 package IP_Rechner;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 public class NetzwerkinfosGui {
 
@@ -17,7 +21,11 @@ public class NetzwerkinfosGui {
 	private Text txtAusgabeNetzwerk;
 	private Text txtAusgabeIP;
 	private Text txtAusgabeMaxHost;
-
+	private boolean offen;
+	
+	public NetzwerkinfosGui() {
+		offen = false;
+	}
 
 	/**
 	 * Open the window.
@@ -27,6 +35,7 @@ public class NetzwerkinfosGui {
 		createContents();
 		shlNetzwerkinformationenBerechnen.open();
 		shlNetzwerkinformationenBerechnen.layout();
+		offen = true;
 		while (!shlNetzwerkinformationenBerechnen.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -43,6 +52,14 @@ public class NetzwerkinfosGui {
 		shlNetzwerkinformationenBerechnen.setImage(SWTResourceManager.getImage(NetzwerkinfosGui.class, "/Icons/IP_Rechner.ico"));
 		shlNetzwerkinformationenBerechnen.setSize(485, 282);
 		shlNetzwerkinformationenBerechnen.setText("Netzwerkinformationen berechnen");
+		shlNetzwerkinformationenBerechnen.addListener(SWT.Close, new Listener() {
+			
+			@Override
+			public void handleEvent(Event arg0) {
+				offen = false;
+				
+			}
+		});
 		
 		Label lblAufforderung = new Label(shlNetzwerkinformationenBerechnen, SWT.NONE);
 		lblAufforderung.setBounds(10, 10, 414, 21);
@@ -89,6 +106,19 @@ public class NetzwerkinfosGui {
 		prefix.setBounds(396, 37, 47, 24);
 		
 		Button btnBerechne = new Button(shlNetzwerkinformationenBerechnen, SWT.NONE);
+		btnBerechne.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Netzwerk AusgabeNetzwerk = new Netzwerk(okt1.getDigits(), okt2.getDigits(), okt3.getDigits(), okt4.getDigits(), prefix.getDigits());
+				txtAusgabeNetzwerk.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
+				String SubnetzmaskePrefix = AusgabeNetzwerk.getSubnetzmaskeDD();
+				SubnetzmaskePrefix.concat(", /");
+				SubnetzmaskePrefix.concat(Integer.toString(AusgabeNetzwerk.getPrefix()));
+				txtAusgabeSubnetzmaske.setText(SubnetzmaskePrefix);
+				txtAusgabeMinHost.setText(AusgabeNetzwerk.getMinHostDD());
+				txtAusgabeMaxHost.setText(AusgabeNetzwerk.getMaxHostDD());
+			}
+		});
 		btnBerechne.setBounds(30, 67, 403, 26);
 		btnBerechne.setText("Berechne Netzwerkinformationen");
 		
@@ -129,5 +159,19 @@ public class NetzwerkinfosGui {
 		
 		
 
+	}
+	
+	public boolean getOffen() {
+		return offen;
+	}
+	
+	public void schliessen() {
+		shlNetzwerkinformationenBerechnen.close();
+	}
+	
+	public void inVordergrund() {
+		shlNetzwerkinformationenBerechnen.setMinimized(false);
+		shlNetzwerkinformationenBerechnen.setActive();
+		shlNetzwerkinformationenBerechnen.moveAbove(null);
 	}
 }

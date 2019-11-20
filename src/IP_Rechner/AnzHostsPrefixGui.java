@@ -1,9 +1,11 @@
 package IP_Rechner;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
@@ -13,8 +15,12 @@ public class AnzHostsPrefixGui {
 	protected Shell shlAnzahlHostsZu;
 	private Text AnzahlHosts;
 	private Text txtAusgPrefix;
+	private boolean offen;
 
-
+	
+	public AnzHostsPrefixGui() {
+		offen = false;
+	}
 
 	/**
 	 * Open the window.
@@ -24,6 +30,7 @@ public class AnzHostsPrefixGui {
 		createContents();
 		shlAnzahlHostsZu.open();
 		shlAnzahlHostsZu.layout();
+		offen = true;
 		while (!shlAnzahlHostsZu.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -40,6 +47,15 @@ public class AnzHostsPrefixGui {
 		shlAnzahlHostsZu.setImage(SWTResourceManager.getImage(AnzHostsPrefixGui.class, "/Icons/IP_Rechner.ico"));
 		shlAnzahlHostsZu.setSize(399, 169);
 		shlAnzahlHostsZu.setText("Anzahl Hosts zu Prefix");
+		shlAnzahlHostsZu.addListener(SWT.Close,new Listener() {
+			
+			@Override
+			public void handleEvent(Event arg0) {
+				offen = false;
+				
+			}
+		});
+		
 		
 		Label lblAufforderung = new Label(shlAnzahlHostsZu, SWT.NONE);
 		lblAufforderung.setBounds(10, 10, 307, 21);
@@ -64,4 +80,20 @@ public class AnzHostsPrefixGui {
 		txtAusgPrefix.setBounds(170, 94, 196, 24);
 
 	}
+	
+	public boolean getOffen() {
+		return offen;
+	}
+	
+	public void schliessen() {
+		shlAnzahlHostsZu.close();
+	}
+
+	public void inVordergrund() {
+		shlAnzahlHostsZu.setMinimized(false);
+		shlAnzahlHostsZu.setActive();
+		shlAnzahlHostsZu.moveAbove(null);
+	}
+	
 }
+

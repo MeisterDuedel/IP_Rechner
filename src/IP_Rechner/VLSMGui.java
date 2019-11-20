@@ -1,6 +1,7 @@
 package IP_Rechner;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -9,6 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -34,6 +36,11 @@ public class VLSMGui {
 	private Label lblUplinknetzwerkadresse;
 	private Label lblPrefixUplink_1;
 	private ProgressBar Statusanzeige;
+	private boolean offen;
+	
+	public VLSMGui() {
+		offen = false;
+	}
 	/**
 	 * Open the window.
 	 */
@@ -42,6 +49,7 @@ public class VLSMGui {
 		createContents();
 		shlVlsmAuswahl.open();
 		shlVlsmAuswahl.layout();
+		offen = true;
 		while (!shlVlsmAuswahl.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -58,6 +66,14 @@ public class VLSMGui {
 		shlVlsmAuswahl.setImage(SWTResourceManager.getImage(VLSMGui.class, "/Icons/IP_Rechner.ico"));
 		shlVlsmAuswahl.setSize(662, 604);
 		shlVlsmAuswahl.setText("VLSM Auswahl");
+		shlVlsmAuswahl.addListener(SWT.Close, new Listener() {
+			
+			@Override
+			public void handleEvent(Event arg0) {
+				offen = false;
+				
+			}
+		});
 		
 		Label lblAufforderung = new Label(shlVlsmAuswahl, SWT.NONE);
 		lblAufforderung.setBounds(10, 10, 626, 21);
@@ -270,5 +286,19 @@ public class VLSMGui {
 		Statusanzeige = new ProgressBar(shlVlsmAuswahl, SWT.NONE);
 		Statusanzeige.setBounds(20, 526, 606, 22);
 
+	}
+	
+	public boolean getOffen() {
+		return offen;
+	}
+	
+	public void schliessen() {
+		shlVlsmAuswahl.close();
+	}
+	
+	public void inVordergrund() {
+		shlVlsmAuswahl.setMinimized(false);
+		shlVlsmAuswahl.setActive();
+		shlVlsmAuswahl.moveAbove(null);
 	}
 }

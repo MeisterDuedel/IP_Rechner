@@ -2,7 +2,9 @@ package IP_Rechner;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -13,7 +15,11 @@ public class SubnetzPrefixGui {
 
 	protected Shell shlSubnetzmaskeZuPrefix;
 	private Text txtAusgPrefix;
-
+	private boolean offen;
+	
+	public SubnetzPrefixGui() {
+		offen = false;
+	}
 
 	/**
 	 * Open the window.
@@ -23,6 +29,7 @@ public class SubnetzPrefixGui {
 		createContents();
 		shlSubnetzmaskeZuPrefix.open();
 		shlSubnetzmaskeZuPrefix.layout();
+		offen = true;
 		while (!shlSubnetzmaskeZuPrefix.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -39,7 +46,14 @@ public class SubnetzPrefixGui {
 		shlSubnetzmaskeZuPrefix.setImage(SWTResourceManager.getImage(SubnetzPrefixGui.class, "/Icons/IP_Rechner.ico"));
 		shlSubnetzmaskeZuPrefix.setText("Subnetzmaske zu Prefix");
 		shlSubnetzmaskeZuPrefix.setSize(403, 174);
-
+		shlSubnetzmaskeZuPrefix.addListener(SWT.Close, new Listener() {
+			
+			@Override
+			public void handleEvent(Event arg0) {
+				offen = false;
+				
+			}
+		});
 		
 		Label lblAufforderung = new Label(shlSubnetzmaskeZuPrefix, SWT.NONE);
 		lblAufforderung.setBounds(10, 10, 367, 21);
@@ -88,5 +102,19 @@ public class SubnetzPrefixGui {
 		txtAusgPrefix = new Text(shlSubnetzmaskeZuPrefix, SWT.READ_ONLY | SWT.MULTI);
 		txtAusgPrefix.setBounds(170, 96, 194, 24);
 		
+	}
+	
+	public boolean getOffen() {
+		return offen;
+	}
+	
+	public void schliessen() {
+		shlSubnetzmaskeZuPrefix.close();
+	}
+	
+	public void inVordergrund() {
+		shlSubnetzmaskeZuPrefix.setMinimized(false);
+		shlSubnetzmaskeZuPrefix.setActive();
+		shlSubnetzmaskeZuPrefix.moveAbove(null);
 	}
 }
