@@ -66,6 +66,13 @@ public class mainGui {
 		btnNetzwerkinformationenBerechnen.setText("Netzwerkinformationen berechnen");
 		
 		Button btnVlsm = new Button(shlIpRechner, SWT.NONE);
+		btnVlsm.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				VLSMGui VLSM = new VLSMGui();
+				VLSM.open();
+			}
+		});
 		btnVlsm.setBounds(90, 69, 250, 26);
 		btnVlsm.setText("VLSM");
 		
