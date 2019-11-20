@@ -109,7 +109,7 @@ public class NetzwerkinfosGui {
 		btnBerechne.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Netzwerk AusgabeNetzwerk = new Netzwerk(okt1.getDigits(), okt2.getDigits(), okt3.getDigits(), okt4.getDigits(), prefix.getDigits());
+				Netzwerk AusgabeNetzwerk = new Netzwerk(okt1.getSelection(), okt2.getSelection(), okt3.getSelection(), okt4.getSelection(), prefix.getSelection());
 				txtAusgabeNetzwerk.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
 				String SubnetzmaskePrefix = AusgabeNetzwerk.getSubnetzmaskeDD();
 				SubnetzmaskePrefix.concat(", /");
