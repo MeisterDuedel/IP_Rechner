@@ -12,7 +12,7 @@ public class Netzwerk {
 	public Netzwerk(long Adresse, int Prefix) {
 		Netzwerkaddr = Adresse;
 		this.Prefix = Prefix;
-		Broadcast = Netzwerkaddr + ((2^(32-this.Prefix))-1);
+		Broadcast = Netzwerkaddr + ((pot(2,32-Prefix))-1);
 		MinHost = Netzwerkaddr +1;
 		MaxHost = Broadcast -1;
 	}
@@ -22,39 +22,19 @@ public class Netzwerk {
 		this.Prefix = Prefix;
 		String IPAddrBin = "";
 		//Erstes Oktett zur Binären IP-Adresse hinzufügen
-		String Temp = LongToBin(okt1);
-		String OktBin = "";
-		for(int i = 0; i< 8- Temp.length();++i) {
-			OktBin = OktBin.concat("0");
-		}
-		OktBin = OktBin.concat(Temp);
+		String OktBin = LongToBin(okt1,false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 		
 		//Zweites Oktett zur Binären IP-Adresse hinzufügen
-		Temp = LongToBin(okt2);
-		OktBin = "";
-		for(int i = 0; i< 8- Temp.length();++i) {
-			OktBin = OktBin.concat("0");
-		}
-		OktBin.concat(Temp);
+		OktBin = LongToBin(okt2,false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 		
 		//Drittes Oktett zur Binären IP-Adresse hinzufügen
-		Temp = LongToBin(okt3);
-		OktBin = "";
-		for(int i = 0; i< 8- Temp.length();++i) {
-			OktBin = OktBin.concat("0");
-		}
-		OktBin = OktBin.concat(Temp);
+		OktBin = LongToBin(okt3,false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 		
 		//Viertes Oktett zur Binären IP-Adresse hinzufügen
-		Temp = LongToBin(okt4);
-		OktBin = "";
-		for(int i = 0; i< 8- Temp.length();++i) {
-			OktBin = OktBin.concat("0");
-		}
-		OktBin=OktBin.concat(Temp);
+		OktBin = LongToBin(okt4,false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 		
 		String NetzwerkAddrBin = "";
@@ -65,27 +45,29 @@ public class Netzwerk {
 		for(int i = 0; i<32-Prefix;++i) {
 			NetzwerkAddrBin = NetzwerkAddrBin.concat("0");
 		}
-		Netzwerkaddr = BinToLong(NetzwerkAddrBin);
 		
-		Broadcast = Netzwerkaddr + ((2^(32-this.Prefix))-1);
+		Netzwerkaddr = BinToLong(NetzwerkAddrBin);
+		System.out.println(NetzwerkAddrBin);
+		
+		Broadcast = Netzwerkaddr + ((pot(2,32-Prefix))-1);
 		MinHost = Netzwerkaddr +1;
 		MaxHost = Broadcast -1;
-		
-		
 		
 	}
 
 	// Wandelt eine dezimale Zahl in eine binäre Zahl um
-	public String LongToBin(long Zahl) {
+	public String LongToBin(long Zahl, boolean Adresse) {	
 		int MaxExponent = 0;
-		while ((2 ^ MaxExponent) < Zahl) { // Finde den Größten zur Umrechnung benötigten Exponenten
-			++MaxExponent;
+		if(Adresse) {
+			MaxExponent = 31;
+		}else {
+			MaxExponent = 7;
 		}
 		String ZahlBin = "";
-
+		System.out.println(pot(2,4));
 		for (int i = 0; i <= MaxExponent; ++i) {
-			if (Zahl - (2 ^ MaxExponent) >= 0) {
-				Zahl -= 2 ^ MaxExponent;
+			if (Zahl - pot(2,MaxExponent-i) >= 0) {
+				Zahl -= pot(2,MaxExponent-i);
 				ZahlBin = ZahlBin.concat("1");
 			} else {
 				ZahlBin = ZahlBin.concat("0");
@@ -99,7 +81,7 @@ public class Netzwerk {
 		long Zahl = 0;
 		for (int i = 0; i < Binaer.length(); ++i) {
 			if (Binaer.charAt(Binaer.length() - 1 - i) == '1') {
-				Zahl += 2 ^ i;
+				Zahl += pot(2,i);
 			}
 		}
 		return Zahl;
@@ -132,12 +114,8 @@ public class Netzwerk {
 
 	//Berechnet die Dotted Decimal Form der Netzwerkadresse und gibt diese Zurück
 	public String getNetzwerkAddrDD() {
-		String Temp = LongToBin(Netzwerkaddr);
-		String NetzwerkAddrBin = "";
-		for (int i = 0; i < 32 - Temp.length(); ++i) { // Binäre Subnetzmaske auf 32 Stellen erweitern
-			NetzwerkAddrBin = NetzwerkAddrBin.concat("0");
-		}
-		NetzwerkAddrBin = NetzwerkAddrBin.concat(Temp);
+		String NetzwerkAddrBin = LongToBin(Netzwerkaddr,true);
+		
 		String NetzwerkaddrDD = BinToAddr(NetzwerkAddrBin);
 		return NetzwerkaddrDD;
 	}
@@ -150,12 +128,7 @@ public class Netzwerk {
 
 	//Berechnet die Dotted Decimal Form der Broadcastadresse und gibt diese Zurück
 	public String getBroadcastDD() {
-		String Temp = LongToBin(Broadcast);
-		String BroadcastBin = "";
-		for (int i = 0; i < 32 - Temp.length(); ++i) { // Binäre Broadcastadresse auf 32 Stellen erweitern
-			BroadcastBin = BroadcastBin.concat("0");
-		}
-		BroadcastBin = BroadcastBin.concat(Temp);
+		String BroadcastBin = LongToBin(Broadcast,true);
 		
 		String BroadcastDD = BinToAddr(BroadcastBin);
 		return BroadcastDD;
@@ -163,12 +136,7 @@ public class Netzwerk {
 	
 	//Berechnet die Dotted Decimal Form der kleinsten Host-Adresse und gibt diese Zurück
 	public String getMinHostDD() {
-		String Temp = LongToBin(MinHost);
-		String MinHostBin = "";
-		for (int i = 0; i < 32 - Temp.length(); ++i) { // Binäre kleinste Host-Adresse auf 32 Stellen erweitern
-		MinHostBin = MinHostBin.concat("0");
-		}
-		MinHostBin = MinHostBin.concat(Temp);
+		String MinHostBin = LongToBin(MinHost,true);
 		
 		String MinHostDD = BinToAddr(MinHostBin);
 		return MinHostDD;
@@ -176,15 +144,22 @@ public class Netzwerk {
 	
 	//Berechnet die Dotted Decimal Form der größten Host-Adresse und gibt diese Zurück
 	public String getMaxHostDD() {
-		String Temp = LongToBin(MaxHost);
-		String MaxHostBin = "";
-		for (int i = 0; i < 32 - Temp.length(); ++i) { // Binäre größte Host-Adresse auf 32 Stellen erweitern
-			MaxHostBin = MaxHostBin.concat("0");
-		}
-		MaxHostBin = MaxHostBin.concat(Temp);
+		String MaxHostBin = LongToBin(MaxHost,true);
 		
 		String MaxHostDD = BinToAddr(MaxHostBin);
 		return MaxHostDD;
+	}
+	
+	private long pot(long Basis, int Exponent) {
+		long Zahl = Basis;
+		if(Exponent == 0) {
+			Zahl = 1;
+		}else {
+			for(int i = 1; i<Exponent; ++i) {
+				Zahl *= Basis;
+			}
+		}
+		return Zahl;
 	}
 	
 	public long getNetzwerkAddr() {

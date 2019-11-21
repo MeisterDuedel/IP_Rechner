@@ -22,6 +22,7 @@ public class NetzwerkinfosGui {
 	private Text txtAusgabeIP;
 	private Text txtAusgabeMaxHost;
 	private boolean offen;
+	private Text txtAusgabeBroadcast;
 	
 	public NetzwerkinfosGui() {
 		offen = false;
@@ -50,7 +51,7 @@ public class NetzwerkinfosGui {
 	protected void createContents() {
 		shlNetzwerkinformationenBerechnen = new Shell();
 		shlNetzwerkinformationenBerechnen.setImage(SWTResourceManager.getImage(NetzwerkinfosGui.class, "/Icons/IP_Rechner.ico"));
-		shlNetzwerkinformationenBerechnen.setSize(485, 282);
+		shlNetzwerkinformationenBerechnen.setSize(485, 312);
 		shlNetzwerkinformationenBerechnen.setText("Netzwerkinformationen berechnen");
 		shlNetzwerkinformationenBerechnen.addListener(SWT.Close, new Listener() {
 			
@@ -135,12 +136,16 @@ public class NetzwerkinfosGui {
 		lblSubnetzmaskePrefix.setText("Subnetzmaske, Prefix:");
 		
 		Label lblKleinsteHostadresse = new Label(shlNetzwerkinformationenBerechnen, SWT.NONE);
-		lblKleinsteHostadresse.setBounds(20, 180, 150, 21);
+		lblKleinsteHostadresse.setBounds(20, 207, 150, 21);
 		lblKleinsteHostadresse.setText("Kleinste Host-Adresse:");
 		
 		Label lblGrteHostadresse = new Label(shlNetzwerkinformationenBerechnen, SWT.NONE);
-		lblGrteHostadresse.setBounds(20, 207, 143, 21);
+		lblGrteHostadresse.setBounds(20, 234, 143, 21);
 		lblGrteHostadresse.setText("Gr\u00F6\u00DFte Host-Adresse:");
+		
+		Label lblBroadcastadresse = new Label(shlNetzwerkinformationenBerechnen, SWT.NONE);
+		lblBroadcastadresse.setText("Broadcastadresse:");
+		lblBroadcastadresse.setBounds(20, 180, 149, 21);
 		
 		txtAusgabeIP = new Text(shlNetzwerkinformationenBerechnen,SWT.READ_ONLY | SWT.MULTI);
 		txtAusgabeIP.setBounds(174, 99, 269, 24);
@@ -151,11 +156,14 @@ public class NetzwerkinfosGui {
 		txtAusgabeSubnetzmaske = new Text(shlNetzwerkinformationenBerechnen,SWT.READ_ONLY | SWT.MULTI);
 		txtAusgabeSubnetzmaske.setBounds(174, 153, 269, 24);
 		
+		txtAusgabeBroadcast = new Text(shlNetzwerkinformationenBerechnen, SWT.READ_ONLY | SWT.MULTI);
+		txtAusgabeBroadcast.setBounds(174, 180, 269, 24);
+		
 		txtAusgabeMinHost = new Text(shlNetzwerkinformationenBerechnen,SWT.READ_ONLY | SWT.MULTI);
-		txtAusgabeMinHost.setBounds(174, 180, 269, 24);
+		txtAusgabeMinHost.setBounds(174, 207, 269, 24);
 		
 		txtAusgabeMaxHost = new Text(shlNetzwerkinformationenBerechnen, SWT.READ_ONLY | SWT.MULTI);
-		txtAusgabeMaxHost.setBounds(174, 207, 269, 24);
+		txtAusgabeMaxHost.setBounds(174, 234, 269, 24);
 		
 		
 

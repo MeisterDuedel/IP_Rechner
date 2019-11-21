@@ -42,7 +42,7 @@ public class VLSMAusgabeGui {
 	protected void createContents() {
 		shlVlsmAusgabe = new Shell();
 		shlVlsmAusgabe.setImage(SWTResourceManager.getImage(VLSMAusgabeGui.class, "/Icons/IP_Rechner.ico"));
-		shlVlsmAusgabe.setSize(810, 610);
+		shlVlsmAusgabe.setSize(934, 610);
 		shlVlsmAusgabe.setText("VLSM Ausgabe");
 		
 		Label lblNetzwerk = new Label(shlVlsmAusgabe, SWT.NONE);
@@ -60,7 +60,7 @@ public class VLSMAusgabeGui {
 		AusgPrefix.setBounds(306, 10, 33, 24);
 		
 		table = new Table(shlVlsmAusgabe, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setBounds(20, 37, 752, 481);
+		table.setBounds(20, 37, 878, 481);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
@@ -79,6 +79,11 @@ public class VLSMAusgabeGui {
 		tblclmnPrefix.setWidth(46);
 		tblclmnPrefix.setText("Prefix");
 		
+		TableColumn tblclmnBroadcastadresse = new TableColumn(table, SWT.NONE);
+		tblclmnBroadcastadresse.setResizable(false);
+		tblclmnBroadcastadresse.setWidth(126);
+		tblclmnBroadcastadresse.setText("Broadcastadresse");
+		
 		TableColumn tblclmnKleinsteHostadresse = new TableColumn(table, SWT.NONE);
 		tblclmnKleinsteHostadresse.setResizable(false);
 		tblclmnKleinsteHostadresse.setWidth(155);
@@ -95,7 +100,7 @@ public class VLSMAusgabeGui {
 		tblclmnAnzahlMglicherHosts.setText("Anzahl m\u00F6glicher Hosts");
 		
 		Button btnHTML = new Button(shlVlsmAusgabe, SWT.NONE);
-		btnHTML.setBounds(29, 524, 732, 26);
+		btnHTML.setBounds(29, 524, 859, 26);
 		btnHTML.setText("Als HTML Speichern");
 
 	}
