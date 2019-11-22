@@ -4,22 +4,14 @@ public class Netzwerk {
 
 	private long Netzwerkaddr;
 	private int Prefix;
-	private long Broadcast;
-	private long MinHost;
-	private long MaxHost;
+	//private long Broadcast;
+	//private long MinHost;
+	//private long MaxHost;
 
 	// Konstruktor für VLSM
 	public Netzwerk(long Adresse, int Prefix) {
 		Netzwerkaddr = Adresse;
 		this.Prefix = Prefix;
-		Broadcast = Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1);
-		if (Prefix < 31) {
-			MinHost = Netzwerkaddr + 1;
-			MaxHost = Broadcast - 1;
-		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
-			MinHost = 0;
-			MinHost = 0;
-		}
 	}
 
 	// Konstruktor für Netzwerkinfos
@@ -52,15 +44,6 @@ public class Netzwerk {
 		}
 
 		Netzwerkaddr = BinToLong(NetzwerkAddrBin);
-
-		Broadcast = Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1);
-		if (Prefix < 31) {
-			MinHost = Netzwerkaddr + 1;
-			MaxHost = Broadcast - 1;
-		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
-			MinHost = 0;
-			MinHost = 0;
-		}
 
 	}
 
@@ -136,7 +119,7 @@ public class Netzwerk {
 
 	// Berechnet die Dotted Decimal Form der Broadcastadresse und gibt diese Zurück
 	public String getBroadcastDD() {
-		String BroadcastBin = LongToBin(Broadcast, true);
+		String BroadcastBin = LongToBin(Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1), true);
 
 		String BroadcastDD = BinToAddr(BroadcastBin);
 		return BroadcastDD;
@@ -145,6 +128,12 @@ public class Netzwerk {
 	// Berechnet die Dotted Decimal Form der kleinsten Host-Adresse und gibt diese
 	// Zurück
 	public String getMinHostDD() {
+		long MinHost = 0;
+		if (Prefix < 31) {
+			MinHost = Netzwerkaddr + +1;
+		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
+			MinHost = 0;
+		}
 		String MinHostBin = LongToBin(MinHost, true);
 
 		String MinHostDD = BinToAddr(MinHostBin);
@@ -154,6 +143,14 @@ public class Netzwerk {
 	// Berechnet die Dotted Decimal Form der größten Host-Adresse und gibt diese
 	// Zurück
 	public String getMaxHostDD() {
+		long MaxHost = 0;
+		
+		if (Prefix < 31) {
+			MaxHost = (Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1)) - 1;
+		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
+			MaxHost = 0;
+		}
+		
 		String MaxHostBin = LongToBin(MaxHost, true);
 
 		String MaxHostDD = BinToAddr(MaxHostBin);
@@ -161,7 +158,7 @@ public class Netzwerk {
 	}
 
 	// Funktion für Potenzrechnung
-	private long pot(long Basis, int Exponent) {
+	protected long pot(long Basis, int Exponent) {
 		long Zahl = Basis;
 		if (Exponent == 0) {
 			Zahl = 1;
@@ -182,14 +179,27 @@ public class Netzwerk {
 	}
 
 	public long getBroadcast() {
-		return Broadcast;
+		return Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1);
 	}
 
 	public long getMinHost() {
+		long MinHost = 0;
+		if (Prefix < 31) {
+			MinHost = Netzwerkaddr + +1;
+		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
+			MinHost = 0;
+		}
+		
 		return MinHost;
 	}
 
 	public long getMaxHost() {
+		long MaxHost = 0;
+		if (Prefix < 31) {
+			MaxHost = (Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1)) - 1;
+		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
+			MaxHost = 0;
+		}
 		return MaxHost;
 	}
 

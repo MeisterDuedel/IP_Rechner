@@ -37,6 +37,7 @@ public class VLSMGui {
 	private Label lblPrefixUplink_1;
 	private ProgressBar Statusanzeige;
 	private boolean offen;
+	private GrundNetzwerk GrundNetzwerk;
 
 	public VLSMGui() {
 		offen = false;
@@ -208,6 +209,21 @@ public class VLSMGui {
 		btnUplinkDefinitivHost.setText("Adresse ist DEFINITIV eine Host-IP-Adresse");
 
 		Button btnBerechneSubnetze = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnBerechneSubnetze.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				Thread ThreadSubnetzeErstellen = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						GrundNetzwerk = new GrundNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(), NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection(), Statusanzeige);
+					}
+				});
+				ThreadSubnetzeErstellen.run();
+			}
+		});
 		btnBerechneSubnetze.setBounds(30, 148, 586, 26);
 		btnBerechneSubnetze.setText("Berechne verf\u00FCgbare Subnetze");
 
