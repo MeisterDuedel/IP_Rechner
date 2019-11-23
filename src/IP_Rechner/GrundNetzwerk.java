@@ -1,6 +1,8 @@
 package IP_Rechner;
 
 import java.util.ArrayList;
+
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
 
 public class GrundNetzwerk extends Netzwerk {
@@ -16,9 +18,9 @@ public class GrundNetzwerk extends Netzwerk {
 		for (int i = 0; i < 30 - Prefix; ++i) {
 			NetzwerkeVerfuegbar.add(new ArrayList<NetzwerkVerfuegbar>());
 		}
-		
-		
+
 		StatAnz.setMaximum(30 - Prefix);
+
 		for (int i = 0; i < 30 - Prefix; ++i) {
 			IndexThreads = i;
 			Threads.add(new Thread(new Runnable() {
@@ -31,17 +33,22 @@ public class GrundNetzwerk extends Netzwerk {
 						NetzwerkeVerfuegbar.get(index)
 								.add(new NetzwerkVerfuegbar(neuesNetzwerkAddr, Prefix + index + 1));
 						neuesNetzwerkAddr += pot(2, 32 - (Prefix + index + 1));
-						
+
 					}
 					System.out.println("Thread ".concat(Integer.toString(index)));
-					//updateStatus();
+					// updateStatus();
+
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							updateStatus();
+						}
+					});
+
 				}
 			}));
 			Threads.get(i).start();
 		}
-		}
-		
-		/*
+
 		for (int i = 0; i < 30 - Prefix; ++i) {
 			try {
 				Threads.get(i).join();
@@ -49,24 +56,11 @@ public class GrundNetzwerk extends Netzwerk {
 				e.printStackTrace();
 			}
 		}
-		
-		
-		/*
-		for (int i = 0; i< 30-Prefix; ++i) {
-			long neuesNetzwerkAddr = getNetzwerkAddr();
-			while (neuesNetzwerkAddr < getBroadcast()) {
-				NetzwerkeVerfuegbar.get(i)
-						.add(new NetzwerkVerfuegbar(neuesNetzwerkAddr, Prefix + i + 1));
-				neuesNetzwerkAddr += pot(2, 32 - (Prefix + i + 1));
-				
-			}
-			System.out.println("Thread ".concat(Integer.toString(i)));
-		}
-		
+
 		System.out.println("fertig");
-		
+
 	}
-	*/
+
 	synchronized private void updateStatus() {
 		StatusAnzeige.setSelection(StatusAnzeige.getSelection() + 1);
 	}

@@ -4,9 +4,9 @@ public class Netzwerk {
 
 	private long Netzwerkaddr;
 	private int Prefix;
-	//private long Broadcast;
-	//private long MinHost;
-	//private long MaxHost;
+	// private long Broadcast;
+	// private long MinHost;
+	// private long MaxHost;
 
 	// Konstruktor für VLSM
 	public Netzwerk(long Adresse, int Prefix) {
@@ -144,13 +144,13 @@ public class Netzwerk {
 	// Zurück
 	public String getMaxHostDD() {
 		long MaxHost = 0;
-		
+
 		if (Prefix < 31) {
 			MaxHost = (Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1)) - 1;
 		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
 			MaxHost = 0;
 		}
-		
+
 		String MaxHostBin = LongToBin(MaxHost, true);
 
 		String MaxHostDD = BinToAddr(MaxHostBin);
@@ -189,7 +189,7 @@ public class Netzwerk {
 		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
 			MinHost = 0;
 		}
-		
+
 		return MinHost;
 	}
 
