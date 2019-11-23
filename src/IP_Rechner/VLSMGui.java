@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.ProgressBar;
 
 public class VLSMGui {
 
@@ -35,7 +34,6 @@ public class VLSMGui {
 	private Text AusgabePrefixUplink;
 	private Label lblUplinknetzwerkadresse;
 	private Label lblPrefixUplink_1;
-	private ProgressBar Statusanzeige;
 	private boolean offen;
 	private GrundNetzwerk GrundNetzwerk;
 
@@ -52,6 +50,7 @@ public class VLSMGui {
 		shlVlsmAuswahl.open();
 		shlVlsmAuswahl.layout();
 		offen = true;
+
 		while (!shlVlsmAuswahl.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -216,17 +215,8 @@ public class VLSMGui {
 		btnBerechneSubnetze.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
-				Thread ThreadSubnetzeErstellen = new Thread(new Runnable() {
-
-					@Override
-					public void run() {
-						GrundNetzwerk = new GrundNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
-								NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection(),
-								Statusanzeige);
-					}
-				});
-				ThreadSubnetzeErstellen.run();
+				GrundNetzwerk = new GrundNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
+						NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
 			}
 		});
 		btnBerechneSubnetze.setBounds(30, 148, 586, 26);
@@ -297,17 +287,16 @@ public class VLSMGui {
 
 		Button btnAusgabe = new Button(shlVlsmAuswahl, SWT.NONE);
 		btnAusgabe.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				VLSMAusgabeGui Ausgabe = new VLSMAusgabeGui();
 				Ausgabe.open();
 			}
+
 		});
 		btnAusgabe.setBounds(425, 494, 191, 26);
 		btnAusgabe.setText("Subnetze Ausgeben");
-
-		Statusanzeige = new ProgressBar(shlVlsmAuswahl, SWT.NONE);
-		Statusanzeige.setBounds(20, 526, 606, 22);
 
 	}
 
