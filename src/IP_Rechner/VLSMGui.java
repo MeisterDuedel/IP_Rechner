@@ -297,6 +297,14 @@ public class VLSMGui {
 		});
 		btnAusgabe.setBounds(425, 494, 191, 26);
 		btnAusgabe.setText("Subnetze Ausgeben");
+		
+		Label lblStatus = new Label(shlVlsmAuswahl, SWT.NONE);
+		lblStatus.setBounds(20, 526, 47, 21);
+		lblStatus.setText("Status:");
+		
+		Label lblAusgabeStatus = new Label(shlVlsmAuswahl, SWT.NONE);
+		lblAusgabeStatus.setBounds(73, 526, 553, 21);
+		lblAusgabeStatus.setText("Bereit");
 
 	}
 
