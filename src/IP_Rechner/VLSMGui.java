@@ -6,6 +6,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Button;
+
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -28,12 +31,13 @@ public class VLSMGui {
 	private Spinner UplinkPrefix;
 	private Button btnUplinkDefinitivHost;
 	private Text AusgGrundNetzwerkAddr;
-	private Text AugPefixGrund;
+	private Text AusgPefixGrund;
 	private Table table;
 	private Text AusgNetzUplink;
 	private Text AusgabePrefixUplink;
 	private Label lblUplinknetzwerkadresse;
 	private Label lblPrefixUplink_1;
+	private Label lblAusgabeStatus;
 	private boolean offen;
 	private GrundNetzwerk GrundNetzwerk;
 
@@ -215,8 +219,15 @@ public class VLSMGui {
 		btnBerechneSubnetze.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				lblAusgabeStatus.setText("Instanziiere Subnetze");
 				GrundNetzwerk = new GrundNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
 						NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
+				lblAusgabeStatus.setText("Ausgabe aktualisieren");
+				AusgGrundNetzwerkAddr.setText(GrundNetzwerk.getNetzwerkAddrDD());
+				String AusgPrefix = "/".concat(Integer.toString(GrundNetzwerk.getPrefix()));
+				AusgPefixGrund.setText(AusgPrefix);
+				ausgabeAktualisieren();
+				lblAusgabeStatus.setText("Bereit");
 			}
 		});
 		btnBerechneSubnetze.setBounds(30, 148, 586, 26);
@@ -233,8 +244,8 @@ public class VLSMGui {
 		lblPrefix_1.setBounds(270, 180, 40, 21);
 		lblPrefix_1.setText("Prefix:");
 
-		AugPefixGrund = new Text(shlVlsmAuswahl, SWT.READ_ONLY | SWT.MULTI);
-		AugPefixGrund.setBounds(316, 180, 33, 24);
+		AusgPefixGrund = new Text(shlVlsmAuswahl, SWT.READ_ONLY | SWT.MULTI);
+		AusgPefixGrund.setBounds(316, 180, 33, 24);
 
 		table = new Table(shlVlsmAuswahl, SWT.BORDER | SWT.FULL_SELECTION);
 		table.setBounds(20, 234, 606, 254);
@@ -297,15 +308,83 @@ public class VLSMGui {
 		});
 		btnAusgabe.setBounds(425, 494, 191, 26);
 		btnAusgabe.setText("Subnetze Ausgeben");
-		
+
 		Label lblStatus = new Label(shlVlsmAuswahl, SWT.NONE);
 		lblStatus.setBounds(20, 526, 47, 21);
 		lblStatus.setText("Status:");
-		
-		Label lblAusgabeStatus = new Label(shlVlsmAuswahl, SWT.NONE);
+
+		lblAusgabeStatus = new Label(shlVlsmAuswahl, SWT.NONE);
 		lblAusgabeStatus.setBounds(73, 526, 553, 21);
 		lblAusgabeStatus.setText("Bereit");
 
+	}
+
+	public void ausgabeAktualisieren() {
+		// Array für die Anzahl an verfügbaren Subnetzen pro Prefix
+		long[] AnzVerfuegbar = new long[30 - GrundNetzwerk.getPrefix()];
+		// Array für die Anzahl an ausgewählten Subnetzen pro Prefix
+		long[] AnzAusgewaehlt = new long[30 - GrundNetzwerk.getPrefix()];
+		// ArrayList für die Threads zum Zählen der Subnetze (ein Thread pro Prefix)
+		ArrayList<Thread> Threads = new ArrayList<Thread>();
+		for (int i = 0; i < 30 - GrundNetzwerk.getPrefix(); ++i) {
+			final int ThreadIndexPrefix = i;
+			// Erstelle Thread zum Zählen der verfügbaren Subnetze
+			Threads.add(new Thread(new Runnable() {
+				int index = ThreadIndexPrefix;
+
+				@Override
+				public void run() {
+					AnzVerfuegbar[index] = GrundNetzwerk.ZaehleVerfuegbareSubnetze(index);
+				}
+			}));
+			Threads.get(Threads.size() - 1).start();
+
+			// Erstelle Thread zum Zählen der ausgewählten Subnetze
+			Threads.add(new Thread(new Runnable() {
+				int index = ThreadIndexPrefix;
+
+				@Override
+				public void run() {
+					AnzAusgewaehlt[index] = GrundNetzwerk.ZaehleAusgewaehlteSubnetze(index);
+				}
+			}));
+			Threads.get(Threads.size() - 1).start();
+		}
+
+		// Erst weiter machen, wenn alle Threads fertig sind
+		for (int i = 0; i < Threads.size(); ++i) {
+			try {
+				Threads.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Trage alle Informationen für jeden Prefix in die Tabelle ein
+		table.removeAll();
+		for (int i = 0; i < 30 - GrundNetzwerk.getPrefix(); ++i) {
+			TableItem eintrag = new TableItem(table, SWT.NONE);
+			String Prefix = "/".concat(Integer.toString(GrundNetzwerk.getPrefix() + i + 1));
+			eintrag.setText(0, Prefix); // Prefix
+			// Anzahl möglicher Hosts
+			eintrag.setText(1, Long.toString(pot(2, 32 - GrundNetzwerk.getPrefix() - i - 1) - 2));
+			eintrag.setText(2, Long.toString(AnzVerfuegbar[i])); // Anzahl Verfügbar
+			eintrag.setText(3, Long.toString(AnzAusgewaehlt[i])); // Anzahl Ausgewählt
+		}
+
+	}
+
+	// Funktion für Potenzrechnung
+	private long pot(long Basis, int Exponent) {
+		long Zahl = Basis;
+		if (Exponent == 0) {
+			Zahl = 1;
+		} else {
+			for (int i = 1; i < Exponent; ++i) {
+				Zahl *= Basis;
+			}
+		}
+		return Zahl;
 	}
 
 	public boolean getOffen() {

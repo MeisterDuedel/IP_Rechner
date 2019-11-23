@@ -98,46 +98,46 @@ public class VLSMAusgabeGui {
 		tblclmnAnzahlMoeglicherHostsSub.setResizable(false);
 		tblclmnAnzahlMoeglicherHostsSub.setWidth(165);
 		tblclmnAnzahlMoeglicherHostsSub.setText("Anzahl m\u00F6glicher Hosts");
-		
+
 		Label lblUnbelegteNetzwerke = new Label(shlVlsmAusgabe, SWT.NONE);
 		lblUnbelegteNetzwerke.setBounds(10, 409, 148, 21);
 		lblUnbelegteNetzwerke.setText("Unbelegte Netzwerke:");
-		
+
 		tableUnbelegt = new Table(shlVlsmAusgabe, SWT.BORDER | SWT.FULL_SELECTION);
 		tableUnbelegt.setLinesVisible(true);
 		tableUnbelegt.setHeaderVisible(true);
 		tableUnbelegt.setBounds(20, 436, 878, 142);
-		
+
 		TableColumn tableclmnNetzwerkadresseUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnNetzwerkadresseUnb.setWidth(121);
 		tableclmnNetzwerkadresseUnb.setText("Netzwerkadresse");
 		tableclmnNetzwerkadresseUnb.setResizable(false);
-		
+
 		TableColumn tableclmnSubnetzmaskeUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnSubnetzmaskeUnb.setWidth(115);
 		tableclmnSubnetzmaskeUnb.setText("Subnetzmaske");
 		tableclmnSubnetzmaskeUnb.setResizable(false);
-		
+
 		TableColumn tableclmnPrefixUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnPrefixUnb.setWidth(46);
 		tableclmnPrefixUnb.setText("Prefix");
 		tableclmnPrefixUnb.setResizable(false);
-		
+
 		TableColumn tableclmnBroadcastadresseUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnBroadcastadresseUnb.setWidth(126);
 		tableclmnBroadcastadresseUnb.setText("Broadcastadresse");
 		tableclmnBroadcastadresseUnb.setResizable(false);
-		
+
 		TableColumn tableclmnKleinsteHostAdresseUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnKleinsteHostAdresseUnb.setWidth(155);
 		tableclmnKleinsteHostAdresseUnb.setText("Kleinste Host-Adresse");
 		tableclmnKleinsteHostAdresseUnb.setResizable(false);
-		
+
 		TableColumn tableclmnGroessteHostAdresseUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnGroessteHostAdresseUnb.setWidth(148);
 		tableclmnGroessteHostAdresseUnb.setText("Gr\u00F6\u00DFte Host-Adresse");
 		tableclmnGroessteHostAdresseUnb.setResizable(false);
-		
+
 		TableColumn tableclmnManzahlMoeglicherHostsUnb = new TableColumn(tableUnbelegt, SWT.NONE);
 		tableclmnManzahlMoeglicherHostsUnb.setWidth(165);
 		tableclmnManzahlMoeglicherHostsUnb.setText("Anzahl m\u00F6glicher Hosts");
