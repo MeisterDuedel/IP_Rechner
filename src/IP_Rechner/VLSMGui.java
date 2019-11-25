@@ -9,11 +9,13 @@ import org.eclipse.swt.widgets.Button;
 
 import java.util.ArrayList;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -289,6 +291,33 @@ public class VLSMGui {
 		AusgabePrefixUplink.setBounds(357, 208, 33, 24);
 
 		Button btnHinzfg = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnHinzfg.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (table.getSelectionIndex() > -1) {
+					if (Integer.parseInt(table.getItem(table.getSelectionIndex()).getText(2)) > 0) {
+						lblAusgabeStatus.setText("Belege Subnetz");
+						GrundNetzwerk.BelegeSubnetz(table.getSelectionIndex());
+						lblAusgabeStatus.setText("Ausgabe aktualisieren");
+						ausgabeAktualisieren();
+						lblAusgabeStatus.setText("Bereit");
+					} else {
+						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+						warnung.setText("Kein Subnetz Verfügbar");
+						String Nachricht = "Es ist kein Subnetz mit dem Prefix "
+								.concat(table.getItem(table.getSelectionIndex()).getText(0)).concat(" verfügbar!");
+						warnung.setMessage(Nachricht);
+						warnung.open();
+					}
+
+				} else {
+					MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+					warnung.setText("Keine Auswahl");
+					warnung.setMessage("Sie haben keinen Eintrag in der Tabelle ausgewählt!");
+					warnung.open();
+				}
+			}
+		});
 		btnHinzfg.setBounds(30, 494, 191, 26);
 		btnHinzfg.setText("1x Zur Auswahl hinzuf\u00FCgen");
 
@@ -321,9 +350,9 @@ public class VLSMGui {
 
 	public void ausgabeAktualisieren() {
 		// Array für die Anzahl an verfügbaren Subnetzen pro Prefix
-		long[] AnzVerfuegbar = new long[30 - GrundNetzwerk.getPrefix()];
+		int[] AnzVerfuegbar = new int[30 - GrundNetzwerk.getPrefix()];
 		// Array für die Anzahl an ausgewählten Subnetzen pro Prefix
-		long[] AnzAusgewaehlt = new long[30 - GrundNetzwerk.getPrefix()];
+		int[] AnzAusgewaehlt = new int[30 - GrundNetzwerk.getPrefix()];
 		// ArrayList für die Threads zum Zählen der Subnetze (ein Thread pro Prefix)
 		ArrayList<Thread> Threads = new ArrayList<Thread>();
 		for (int i = 0; i < 30 - GrundNetzwerk.getPrefix(); ++i) {
@@ -368,8 +397,8 @@ public class VLSMGui {
 			eintrag.setText(0, Prefix); // Prefix
 			// Anzahl möglicher Hosts
 			eintrag.setText(1, Long.toString(pot(2, 32 - GrundNetzwerk.getPrefix() - i - 1) - 2));
-			eintrag.setText(2, Long.toString(AnzVerfuegbar[i])); // Anzahl Verfügbar
-			eintrag.setText(3, Long.toString(AnzAusgewaehlt[i])); // Anzahl Ausgewählt
+			eintrag.setText(2, Integer.toString(AnzVerfuegbar[i])); // Anzahl Verfügbar
+			eintrag.setText(3, Integer.toString(AnzAusgewaehlt[i])); // Anzahl Ausgewählt
 		}
 
 	}

@@ -45,11 +45,12 @@ public class GrundNetzwerk extends Netzwerk {
 			}
 		}
 		Threads.clear();
-
+		for (int i = 0; i < NetzwerkeVerfuegbar.get(NetzwerkeVerfuegbar.size() - 1).size(); ++i) {
+		}
 	}
 
 	// Zähle die noch verfügbaren Subnetze
-	public long ZaehleVerfuegbareSubnetze(int IndexPrefix) {
+	public int ZaehleVerfuegbareSubnetze(int IndexPrefix) {
 		int Zaehler = 0;
 		for (int i = 0; i < NetzwerkeVerfuegbar.get(IndexPrefix).size(); ++i) {
 			if (NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getVerfuegbar() == true) {
@@ -60,7 +61,7 @@ public class GrundNetzwerk extends Netzwerk {
 	}
 
 	// Zähle die durch den Benutzer ausgewählten Subnetze
-	public long ZaehleAusgewaehlteSubnetze(int IndexPrefix) {
+	public int ZaehleAusgewaehlteSubnetze(int IndexPrefix) {
 		int Zaehler = 0;
 		for (int i = 0; i < NetzwerkeVerfuegbar.get(IndexPrefix).size(); ++i) {
 			if (NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getManuell() == true) {
@@ -68,6 +69,110 @@ public class GrundNetzwerk extends Netzwerk {
 			}
 		}
 		return Zaehler;
+	}
+
+	// Findet das erste freie Subnetz zu einem Prefix
+	public int FindeFreiesNetzwerk(int IndexPrefix) {
+		int i = 0;
+		while (i < NetzwerkeVerfuegbar.get(IndexPrefix).size()
+				&& !NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getVerfuegbar()) {
+			++i;
+		}
+		return i;
+	}
+
+	// Findet das letzte manuell belegte Subnetz zu einem Prefix
+	public int FindeLetzesBelegtesNetzwerk(int IndexPrefix) {
+		int i = NetzwerkeVerfuegbar.get(IndexPrefix).size() - 1;
+		while (i >= 0 && !NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getManuell()) {
+			--i;
+		}
+		return i;
+	}
+
+	// Aktualisiert die Verfügbarkeit der Subnetze, nachdem ein Subnetz zur Auswahl
+	// hinzugefügt wurde
+	public void AktualisiereVerfuegbarkeitHinz(int IndexPrefixBasis, int IndexPosBasis) {
+		/*
+		 * ArrayList für die Threads zur Aktualisierung der Verfügbarkeiten Vorwärts:
+		 * Ein Thread pro Prefix Rückwärts: Ein Thread für alle Prefixe (es muss ja nur
+		 * ein Subnetz pro Prefix aktualisiert werden)
+		 */
+		ArrayList<Thread> Threads = new ArrayList<Thread>();
+		// Im Prinzip von IndexPrefix +1 bis zum letzten Prefix
+		// In dieser Form besser für Berechnungen
+		for (int i = 0; i < 30 - getPrefix() - IndexPrefixBasis - 1; ++i) {
+
+			// Damit ein Thread weiß, auf welchen Index ("Prefix") er in der ArrayList
+			// zugreifen muss
+			final int IndexThread = i;
+			// neuer Thread zur Aktualisierung eines nachfolgenden Prefixes
+			Threads.add(new Thread(new Runnable() {
+				int index = IndexThread; // Index zur Berechnung von IndexPrefix und den zu aktualisierenden Prefix
+				int IndexPrefix = IndexPrefixBasis; // Kopie zur Sicherheit
+
+				// StartIndex im zu aktualisierenden Prefix (damit ich nicht durchs ganze Array
+				// muss)
+				int IndexStart = IndexPosBasis * potint(2, index + 1);
+
+				@Override
+				public void run() {
+					// Aktualisiere die von der Auswahl betroffenen Subnetze im Prefix
+					for (int i = 0; i < pot(2, index + 1); ++i) {
+						NetzwerkeVerfuegbar.get(IndexPrefix + index + 1).get(IndexStart + i).setVerfuegbar(false);
+					}
+				}
+			}));
+			Threads.get(Threads.size() - 1).start(); // starte Thread
+		}
+
+		// Thread zum Aktualisieren der vorherigen Prefixe
+		Threads.add(new Thread(new Runnable() {
+			// Kopien zur Sicherheit
+			int IndexPrefix = IndexPrefixBasis;
+			int IndexPos = IndexPosBasis;
+
+			@Override
+			public void run() {
+				// Aktalisiere das betroffene Subnetz im Prefix
+				for (int i = 0; i < IndexPrefix; ++i) {
+					NetzwerkeVerfuegbar.get(IndexPrefix - i - 1).get(IndexPos / potint(2, i + 1)).setVerfuegbar(false);
+
+				}
+
+			}
+		}));
+		Threads.get(Threads.size() - 1).start();// starte Thread
+
+		// Erst weitermachen, wenn alle Threads fertig sind
+		for (int i = 0; i < Threads.size(); ++i) {
+			try {
+				Threads.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	// Beleget ein Subnetz im übergebenen Prefix
+	public void BelegeSubnetz(int IndexPrefix) {
+		int pos = FindeFreiesNetzwerk(IndexPrefix);
+		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setManuell(true);
+		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setVerfuegbar(false);
+		AktualisiereVerfuegbarkeitHinz(IndexPrefix, pos);
+	}
+
+	// Funktion für Potenzrechnung mit Integern
+	private int potint(int Basis, int Exponent) {
+		int Zahl = Basis;
+		if (Exponent == 0) {
+			Zahl = 1;
+		} else {
+			for (int i = 1; i < Exponent; ++i) {
+				Zahl *= Basis;
+			}
+		}
+		return Zahl;
 	}
 
 }
