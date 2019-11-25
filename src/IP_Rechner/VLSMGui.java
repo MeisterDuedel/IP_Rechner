@@ -6,10 +6,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Button;
-
-import java.util.ArrayList;
-
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,6 +38,7 @@ public class VLSMGui {
 	private Label lblAusgabeStatus;
 	private boolean offen;
 	private GrundNetzwerk GrundNetzwerk;
+	private SubnetzeAusgabeNetzwerk AusgabeNetzwerk;
 
 	public VLSMGui() {
 		offen = false;
@@ -136,7 +133,7 @@ public class VLSMGui {
 		btnUplink.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// System.out.println("test");
+				// Aktiviere/Deaktiviere die Ein/Ausgabe-Elemente für das Uplink Netzwerk
 				if (btnUplink.getSelection()) {
 					lblAdresse.setEnabled(true);
 					UplinkOkt1.setEnabled(true);
@@ -222,11 +219,14 @@ public class VLSMGui {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				lblAusgabeStatus.setText("Instanziiere Subnetze");
-				GrundNetzwerk =new GrundNetzwerk(NetzwerkPrefix.getSelection());
-				Netzwerk Temp = new Netzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(), NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
+				// Instanziiere ein Objekt von GrundNetzwerk zur Auswahl der Subnetze
+				GrundNetzwerk = new GrundNetzwerk(NetzwerkPrefix.getSelection());
+				// Instanziiere Netzwerk zur Ausgabe
+				AusgabeNetzwerk = new SubnetzeAusgabeNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
+						NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
 				lblAusgabeStatus.setText("Ausgabe aktualisieren");
-				AusgGrundNetzwerkAddr.setText(Temp.getNetzwerkAddrDD());
-				String AusgPrefix = "/".concat(Integer.toString(Temp.getPrefix()));
+				AusgGrundNetzwerkAddr.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
+				String AusgPrefix = "/".concat(Integer.toString(AusgabeNetzwerk.getPrefix()));
 				AusgPefixGrund.setText(AusgPrefix);
 				ausgabeAktualisieren();
 				lblAusgabeStatus.setText("Bereit");
@@ -294,10 +294,12 @@ public class VLSMGui {
 		btnHinzfg.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				// Testen, ob ein Eintrag in der Tabelle ausgewählt wurde
 				if (table.getSelectionIndex() > -1) {
+					// Testen, ob noch ein Subnetz im Prefix verfügbar ist
 					if (Integer.parseInt(table.getItem(table.getSelectionIndex()).getText(2)) > 0) {
 						lblAusgabeStatus.setText("Belege Subnetz");
-						GrundNetzwerk.BelegeSubnetz(table.getSelectionIndex());
+						GrundNetzwerk.BelegeSubnetz(table.getSelectionIndex()); // Belege das Subnetz
 						lblAusgabeStatus.setText("Ausgabe aktualisieren");
 						ausgabeAktualisieren();
 						lblAusgabeStatus.setText("Bereit");
@@ -322,6 +324,36 @@ public class VLSMGui {
 		btnHinzfg.setText("1x Zur Auswahl hinzuf\u00FCgen");
 
 		Button btnEntfernen = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnEntfernen.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// Testen, ob ein Eintrag in der Tabelle ausgewählt wurde
+				if (table.getSelectionIndex() > -1) {
+					// Testen, ob ein Subnetz mit entsprechendem Prefix bereits ausgewählt wurde
+					if (Integer.parseInt(table.getItem(table.getSelectionIndex()).getText(3)) > 0) {
+						lblAusgabeStatus.setText("Gebe Subnetz frei");
+						GrundNetzwerk.GebeSubnetzFrei(table.getSelectionIndex()); // Subnetz freigeben
+						lblAusgabeStatus.setText("Ausgabe aktualisieren");
+						ausgabeAktualisieren();
+						lblAusgabeStatus.setText("Bereit");
+					} else {
+						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+						warnung.setText("Kein Subnetz in Auswahl");
+						String Nachricht = "Sie haben kein Subnetz mit dem Prefix "
+								.concat(table.getItem(table.getSelectionIndex()).getText(0))
+								.concat(" zur Auswahl hinzugefügt!");
+						warnung.setMessage(Nachricht);
+						warnung.open();
+					}
+
+				} else {
+					MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+					warnung.setText("Keine Auswahl");
+					warnung.setMessage("Sie haben keinen Eintrag in der Tabelle ausgewählt!");
+					warnung.open();
+				}
+			}
+		});
 		btnEntfernen.setBounds(227, 494, 191, 26);
 		btnEntfernen.setText("1x Aus Auswahl entfernen");
 
@@ -348,12 +380,13 @@ public class VLSMGui {
 
 	}
 
+	// Aktualisiert die Tabelle
 	public void ausgabeAktualisieren() {
 		// Array für die Anzahl an verfügbaren Subnetzen pro Prefix
 		int[] AnzVerfuegbar = GrundNetzwerk.getNetzwerkeVerfuegbar();
 		// Array für die Anzahl an ausgewählten Subnetzen pro Prefix
 		int[] AnzAusgewaehlt = GrundNetzwerk.getNetzwerkeAusgewaehlt();
-		
+
 		// Trage alle Informationen für jeden Prefix in die Tabelle ein
 		table.removeAll();
 		for (int i = 0; i < AnzVerfuegbar.length; ++i) {

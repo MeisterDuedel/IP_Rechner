@@ -57,6 +57,29 @@ public class GrundNetzwerk {
 		}
 	}
 
+	// Gibt ein Subnetz frei und aktualisiert die Verfügbarkeit der übrigen Subnetze
+	public void GebeSubnetzFrei(int IndexPrefix) {
+		NetzwerkeVerfuegbar[IndexPrefix] += 1; // Mache Subnetz wieder verfügbar
+		NetzwerkeAusgewaehlt[IndexPrefix] -= 1; // Entferne Subnetz aus Auswahl
+		// Aktualisiere die Anzahl der verfügbaren Subnetze in den nachfolgenden
+		// Prefixen
+		for (int i = 0; i < 30 - Prefix - IndexPrefix - 1; ++i) {
+			NetzwerkeVerfuegbar[IndexPrefix + i + 1] += potint(2, i + 1);
+		}
+
+		// Aktualisiere die Anzahl der verfügbaren Subnetze in den vorhergehenden
+		// Prefixen
+		for (int i = IndexPrefix - 1; i >= 0; --i) {
+			/*
+			 * Wenn die Anzahl an verfügbaren Subnetzen im nachfolgenden Prefix gleich 2*
+			 * die (noch) aktuelle Anzahl an möglichen Subnetzen im Prefix+1 ist
+			 */
+			if (NetzwerkeVerfuegbar[i + 1] == 2 * (NetzwerkeVerfuegbar[i] + 1)) {
+				NetzwerkeVerfuegbar[i] += 1;
+			}
+		}
+	}
+
 	public int[] getNetzwerkeVerfuegbar() {
 		return NetzwerkeVerfuegbar;
 	}

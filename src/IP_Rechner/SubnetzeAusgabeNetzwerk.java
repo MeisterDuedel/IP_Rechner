@@ -81,21 +81,12 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		return i;
 	}
 
-	// Findet das letzte manuell belegte Subnetz zu einem Prefix
-	public int FindeLetzesBelegtesNetzwerk(int IndexPrefix) {
-		int i = NetzwerkeVerfuegbar.get(IndexPrefix).size() - 1;
-		while (i >= 0 && !NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getManuell()) {
-			--i;
-		}
-		return i;
-	}
-
 	// Aktualisiert die Verfügbarkeit der Subnetze, nachdem ein Subnetz zur Auswahl
 	// hinzugefügt wurde
 	public void AktualisiereVerfuegbarkeitHinz(int IndexPrefixBasis, int IndexPosBasis) {
 		/*
-		 * ArrayList für die Threads zur Aktualisierung der Verfügbarkeiten Vorwärts:
-		 * Ein Thread pro Prefix Rückwärts: Ein Thread für alle Prefixe (es muss ja nur
+		 * ArrayList für die Threads zur Aktualisierung der Verfügbarkeiten. Vorwärts:
+		 * Ein Thread pro Prefix Rückwärts: Ein Thread für alle Prefixe (es muss nur
 		 * ein Subnetz pro Prefix aktualisiert werden)
 		 */
 		ArrayList<Thread> Threads = new ArrayList<Thread>();
