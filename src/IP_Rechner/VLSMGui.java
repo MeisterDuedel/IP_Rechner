@@ -222,11 +222,11 @@ public class VLSMGui {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				lblAusgabeStatus.setText("Instanziiere Subnetze");
-				GrundNetzwerk = new GrundNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
-						NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
+				GrundNetzwerk =new GrundNetzwerk(NetzwerkPrefix.getSelection());
+				Netzwerk Temp = new Netzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(), NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
 				lblAusgabeStatus.setText("Ausgabe aktualisieren");
-				AusgGrundNetzwerkAddr.setText(GrundNetzwerk.getNetzwerkAddrDD());
-				String AusgPrefix = "/".concat(Integer.toString(GrundNetzwerk.getPrefix()));
+				AusgGrundNetzwerkAddr.setText(Temp.getNetzwerkAddrDD());
+				String AusgPrefix = "/".concat(Integer.toString(Temp.getPrefix()));
 				AusgPefixGrund.setText(AusgPrefix);
 				ausgabeAktualisieren();
 				lblAusgabeStatus.setText("Bereit");
@@ -350,48 +350,13 @@ public class VLSMGui {
 
 	public void ausgabeAktualisieren() {
 		// Array für die Anzahl an verfügbaren Subnetzen pro Prefix
-		int[] AnzVerfuegbar = new int[30 - GrundNetzwerk.getPrefix()];
+		int[] AnzVerfuegbar = GrundNetzwerk.getNetzwerkeVerfuegbar();
 		// Array für die Anzahl an ausgewählten Subnetzen pro Prefix
-		int[] AnzAusgewaehlt = new int[30 - GrundNetzwerk.getPrefix()];
-		// ArrayList für die Threads zum Zählen der Subnetze (ein Thread pro Prefix)
-		ArrayList<Thread> Threads = new ArrayList<Thread>();
-		for (int i = 0; i < 30 - GrundNetzwerk.getPrefix(); ++i) {
-			final int ThreadIndexPrefix = i;
-			// Erstelle Thread zum Zählen der verfügbaren Subnetze
-			Threads.add(new Thread(new Runnable() {
-				int index = ThreadIndexPrefix;
-
-				@Override
-				public void run() {
-					AnzVerfuegbar[index] = GrundNetzwerk.ZaehleVerfuegbareSubnetze(index);
-				}
-			}));
-			Threads.get(Threads.size() - 1).start();
-
-			// Erstelle Thread zum Zählen der ausgewählten Subnetze
-			Threads.add(new Thread(new Runnable() {
-				int index = ThreadIndexPrefix;
-
-				@Override
-				public void run() {
-					AnzAusgewaehlt[index] = GrundNetzwerk.ZaehleAusgewaehlteSubnetze(index);
-				}
-			}));
-			Threads.get(Threads.size() - 1).start();
-		}
-
-		// Erst weiter machen, wenn alle Threads fertig sind
-		for (int i = 0; i < Threads.size(); ++i) {
-			try {
-				Threads.get(i).join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-
+		int[] AnzAusgewaehlt = GrundNetzwerk.getNetzwerkeAusgewaehlt();
+		
 		// Trage alle Informationen für jeden Prefix in die Tabelle ein
 		table.removeAll();
-		for (int i = 0; i < 30 - GrundNetzwerk.getPrefix(); ++i) {
+		for (int i = 0; i < AnzVerfuegbar.length; ++i) {
 			TableItem eintrag = new TableItem(table, SWT.NONE);
 			String Prefix = "/".concat(Integer.toString(GrundNetzwerk.getPrefix() + i + 1));
 			eintrag.setText(0, Prefix); // Prefix
