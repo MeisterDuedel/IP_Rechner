@@ -49,27 +49,37 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		}
 	}
 
-	// Zähle die noch verfügbaren Subnetze
-	public int ZaehleVerfuegbareSubnetze(int IndexPrefix) {
-		int Zaehler = 0;
-		for (int i = 0; i < NetzwerkeVerfuegbar.get(IndexPrefix).size(); ++i) {
-			if (NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getVerfuegbar() == true) {
-				++Zaehler;
+	// Zählt die noch verfügbaren Subnetze
+	public int[] ZaehleVerfuegbareSubnetze() {
+		int[] Verfuegbar = new int[NetzwerkeVerfuegbar.size()];
+		ArrayList<Thread> Threads = new ArrayList<Thread>();
+		for(int i = 0; i<NetzwerkeVerfuegbar.size();++i) {
+			final int IndexPrefixThread = i;
+			Threads.add(new Thread(new Runnable() {
+				int index = IndexPrefixThread;
+				@Override
+				public void run() {
+					int Zaehler = 0;
+					for(int i = 0; i<NetzwerkeVerfuegbar.get(index).size();++i) {
+						if(NetzwerkeVerfuegbar.get(index).get(i).getVerfuegbar()) {
+							++Zaehler;
+						}
+					}
+					Verfuegbar[index] = Zaehler;	
+				}
+			}));
+			Threads.get(i).start();
+		}
+		for(int i = 0; i<Threads.size();++i) {
+			try {
+				Threads.get(i).join();
+			}catch(InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
-		return Zaehler;
+		return Verfuegbar;
 	}
 
-	// Zähle die durch den Benutzer ausgewählten Subnetze
-	public int ZaehleAusgewaehlteSubnetze(int IndexPrefix) {
-		int Zaehler = 0;
-		for (int i = 0; i < NetzwerkeVerfuegbar.get(IndexPrefix).size(); ++i) {
-			if (NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getManuell() == true) {
-				++Zaehler;
-			}
-		}
-		return Zaehler;
-	}
 
 	// Findet das erste freie Subnetz zu einem Prefix
 	public int FindeFreiesNetzwerk(int IndexPrefix) {
@@ -86,8 +96,8 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 	public void AktualisiereVerfuegbarkeitHinz(int IndexPrefixBasis, int IndexPosBasis) {
 		/*
 		 * ArrayList für die Threads zur Aktualisierung der Verfügbarkeiten. Vorwärts:
-		 * Ein Thread pro Prefix Rückwärts: Ein Thread für alle Prefixe (es muss nur
-		 * ein Subnetz pro Prefix aktualisiert werden)
+		 * Ein Thread pro Prefix Rückwärts: Ein Thread für alle Prefixe (es muss nur ein
+		 * Subnetz pro Prefix aktualisiert werden)
 		 */
 		ArrayList<Thread> Threads = new ArrayList<Thread>();
 		// Im Prinzip von IndexPrefix +1 bis zum letzten Prefix
@@ -149,6 +159,19 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 	public void BelegeSubnetz(int IndexPrefix) {
 		int pos = FindeFreiesNetzwerk(IndexPrefix);
 		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setManuell(true);
+		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setVerfuegbar(false);
+		AktualisiereVerfuegbarkeitHinz(IndexPrefix, pos);
+	}
+
+	// Belegt das Uplink-Netzwerk
+	public void BelegeUplinkSubnetz(long NetzwerkADDR, int IndexPrefix) {
+		int pos = 0;
+		//Finde das Netzwerk im Prefix
+		while (pos < NetzwerkeVerfuegbar.get(IndexPrefix).size()
+				&& NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).getNetzwerkAddr() != NetzwerkADDR) {
+			++pos;
+		}
+		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setUplink(true);
 		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setVerfuegbar(false);
 		AktualisiereVerfuegbarkeitHinz(IndexPrefix, pos);
 	}

@@ -29,7 +29,7 @@ public class VLSMGui {
 	private Spinner UplinkPrefix;
 	private Button btnUplinkDefinitivHost;
 	private Text AusgGrundNetzwerkAddr;
-	private Text AusgPefixGrund;
+	private Text AusgPrefixGrund;
 	private Table table;
 	private Text AusgNetzUplink;
 	private Text AusgabePrefixUplink;
@@ -218,18 +218,150 @@ public class VLSMGui {
 		btnBerechneSubnetze.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				lblAusgabeStatus.setText("Instanziiere Subnetze");
-				// Instanziiere ein Objekt von GrundNetzwerk zur Auswahl der Subnetze
-				GrundNetzwerk = new GrundNetzwerk(NetzwerkPrefix.getSelection());
-				// Instanziiere Netzwerk zur Ausgabe
-				AusgabeNetzwerk = new SubnetzeAusgabeNetzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
-						NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
-				lblAusgabeStatus.setText("Ausgabe aktualisieren");
-				AusgGrundNetzwerkAddr.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
-				String AusgPrefix = "/".concat(Integer.toString(AusgabeNetzwerk.getPrefix()));
-				AusgPefixGrund.setText(AusgPrefix);
-				ausgabeAktualisieren();
-				lblAusgabeStatus.setText("Bereit");
+				// Testen, ob ein Uplink Netzwerk reserviert werden soll
+				if (!btnUplink.getSelection()) { // wenn nein
+					lblAusgabeStatus.setText("Instanziiere Subnetze");
+					// Instanziiere ein Objekt von GrundNetzwerk zur Auswahl der Subnetze
+					GrundNetzwerk = new GrundNetzwerk(NetzwerkPrefix.getSelection());
+					// Instanziiere Netzwerk zur Ausgabe
+					AusgabeNetzwerk = new SubnetzeAusgabeNetzwerk(NetzwerkOkt1.getSelection(),
+							NetzwerkOkt2.getSelection(), NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(),
+							NetzwerkPrefix.getSelection());
+					lblAusgabeStatus.setText("Ausgabe aktualisieren");
+					// Netzwerkadresse und Prefix des Grundnetzwerks ausgeben
+					AusgGrundNetzwerkAddr.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
+					String AusgPrefix = "/".concat(Integer.toString(AusgabeNetzwerk.getPrefix()));
+					AusgPrefixGrund.setText(AusgPrefix);
+					// Netzwerkadresse und Prefix von Uplink-Netzwerk leeren
+					AusgabePrefixUplink.setText("");
+					AusgNetzUplink.setText("");
+					ausgabeAktualisieren();
+					lblAusgabeStatus.setText("Bereit");
+				} else { // wenn ja
+					int UplinkNetzwerkPrefix = 0;
+					// Eingegebene IP-Adresse von Dotted-Decimal in dezimale Zahl umwandeln
+					long UplinkIpAddr = UplinkEingabeIP(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
+							UplinkOkt3.getSelection(), UplinkOkt4.getSelection());
+
+					// Prüfen, ob eingegebene IP-Adresse unbedingt als Host-Ip behandelt werden muss
+					if (!btnUplinkDefinitivHost.getSelection()) { // wenn nein
+						// Prüfen, ob kleinstmögliches Netzwerk genommen werden soll
+						if (UplinkPrefix.getSelection() == 8) {
+							// wenn ja
+							UplinkNetzwerkPrefix = 30;
+						} else {
+							// wenn nein
+							UplinkNetzwerkPrefix = UplinkPrefix.getSelection();
+						}
+					} else { // wenn ja
+						// Prüfen, ob kleinstmögliches Netzwerk herausgefunden werden soll
+						if (UplinkPrefix.getSelection() == 8) {
+							// wenn ja
+							// Aus 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-Ip-Adresse berechnet
+							// werden
+							if (UplinkIpAddr == 0) {
+								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+								warnung.setText("Uplink Adresse = Broadcastadresse");
+								warnung.setMessage(
+										"Aus der IP-Adresse 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-IP-Adresse berechnet werden!");
+								warnung.open();
+								return;
+							}
+							UplinkNetzwerkPrefix = 30;
+							Netzwerk dummy = new Netzwerk(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
+									UplinkOkt3.getSelection(), UplinkOkt4.getSelection(), UplinkNetzwerkPrefix);
+							// Finde kleinstes Netzwerk, bei dem die Netzwerkadresse und die
+							// Broadcastadresse != der eingegebenen IP-Adresse sind
+							while ((dummy.getNetzwerkAddr() == UplinkIpAddr || dummy.getBroadcast() == UplinkIpAddr)
+									&& UplinkNetzwerkPrefix > 8) {
+								--UplinkNetzwerkPrefix;
+								dummy = new Netzwerk(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
+										UplinkOkt3.getSelection(), UplinkOkt4.getSelection(), UplinkNetzwerkPrefix);
+							}
+						} else { // wenn nein
+							UplinkNetzwerkPrefix = UplinkPrefix.getSelection();
+							Netzwerk dummy = new Netzwerk(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
+									UplinkOkt3.getSelection(), UplinkOkt4.getSelection(), UplinkNetzwerkPrefix);
+							// Prüfe, ob Eingegebene IP-Adresse nicht die eine Netzwerkadresse ist
+							if (dummy.getNetzwerkAddr() == UplinkIpAddr) {
+								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+								warnung.setText("Uplink Adresse = Netzwerkadresse");
+								warnung.setMessage(
+										"Die eingegebene IP-Adresse für das Uplink-Netzwerk ist eine Netzwerkadresse! Vorgang wird abgebrochen!");
+								warnung.open();
+								return;
+								// Prüfe, ob Eingegebene IP-Adresse nicht die eine Broadcastadresse ist
+							} else if (dummy.getBroadcast() == UplinkIpAddr) {
+								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+								warnung.setText("Uplink Adresse = Broadcastadresse");
+								warnung.setMessage(
+										"Die eingegebene IP-Adresse für das Uplink-Netzwerk ist eine Broadcastadresse! Vorgang wird abgebrochen!");
+								warnung.open();
+								return;
+							}
+						}
+					}
+					// Prüfen, ob Uplink-Netzwerk größer als Grundnetzwerk ist
+					if (UplinkNetzwerkPrefix < NetzwerkPrefix.getSelection()) {
+						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+						warnung.setText("Uplink Netzwerk größer als Grundnetzwerk");
+						warnung.setMessage(
+								"Das eingegebene Uplink-Netzwerk ist größer als das eingegebene Grund-Netzwerk! Vorgang wird Abgebrochen!");
+						warnung.open();
+						return;
+						// Prüfen, ob Uplink-Netzwerk und Grundnetzwerk gleich groß sind
+					} else if (UplinkNetzwerkPrefix == NetzwerkPrefix.getSelection()) {
+						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+						warnung.setText("Uplink Netzwerk und Grundnetzwerk gleich groß");
+						warnung.setMessage(
+								"Das eingegebene Uplink-Netzwerk ist genau so groß wie das eingegebene Grund-Netzwerk! Vorgang wird Abgebrochen!");
+						warnung.open();
+						return;
+					}
+
+					Netzwerk dummyUplink = new Netzwerk(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
+							UplinkOkt3.getSelection(), UplinkOkt4.getSelection(), UplinkNetzwerkPrefix);
+					Netzwerk dummyNetzwerk = new Netzwerk(NetzwerkOkt1.getSelection(), NetzwerkOkt2.getSelection(),
+							NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(), NetzwerkPrefix.getSelection());
+
+					// Prüfen, ob Uplink-Netzwerk nicht im Grundnetzwerk liegt
+					if (dummyUplink.getNetzwerkAddr() < dummyNetzwerk.getNetzwerkAddr()
+							|| dummyUplink.getNetzwerkAddr() > dummyNetzwerk.getBroadcast()) {
+						String Ausgabe = "Das Uplink-Netzwerk ".concat(dummyUplink.getNetzwerkAddrDD()).concat(", /")
+								.concat(Integer.toString(UplinkNetzwerkPrefix))
+								.concat(" liegt nicht innerhalb des Grund-Netzwerks!");
+						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+						warnung.setText("Uplink Netzwerk liegt nicht im Grund-Netzwerk");
+						warnung.setMessage(Ausgabe);
+						warnung.open();
+						return;
+					}
+
+					lblAusgabeStatus.setText("Instanziiere Subnetze");
+					// Instanziiere ein Objekt von GrundNetzwerk zur Auswahl der Subnetze
+					GrundNetzwerk = new GrundNetzwerk(NetzwerkPrefix.getSelection());
+					// Instanziiere Netzwerk zur Ausgabe
+					AusgabeNetzwerk = new SubnetzeAusgabeNetzwerk(NetzwerkOkt1.getSelection(),
+							NetzwerkOkt2.getSelection(), NetzwerkOkt3.getSelection(), NetzwerkOkt4.getSelection(),
+							NetzwerkPrefix.getSelection());
+					lblAusgabeStatus.setText("Belege Uplink Netzwerk");
+					// Belege Uplink Netzwerk
+					GrundNetzwerk.BelegeUplinkSubnetz(UplinkNetzwerkPrefix - NetzwerkPrefix.getSelection() - 1);
+					AusgabeNetzwerk.BelegeUplinkSubnetz(dummyUplink.getNetzwerkAddr(),
+							UplinkNetzwerkPrefix - NetzwerkPrefix.getSelection() - 1);
+					// Ausgabe Aktualisieren
+					lblAusgabeStatus.setText("Ausgabe aktualisieren");
+					// Netzwerkadresse und Prefix des Grundnetzwerks ausgeben
+					AusgGrundNetzwerkAddr.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
+					String AusgPrefix = "/".concat(Integer.toString(AusgabeNetzwerk.getPrefix()));
+					AusgPrefixGrund.setText(AusgPrefix);
+					// Netzwerkadresse und Prefix des Uplink-Netzwerks ausgeben
+					AusgNetzUplink.setText(dummyUplink.getNetzwerkAddrDD());
+					AusgPrefix = "/".concat(Integer.toString(dummyUplink.getPrefix()));
+					AusgabePrefixUplink.setText(AusgPrefix);
+					ausgabeAktualisieren();
+					lblAusgabeStatus.setText("Bereit");
+				}
 			}
 		});
 		btnBerechneSubnetze.setBounds(30, 148, 586, 26);
@@ -246,8 +378,8 @@ public class VLSMGui {
 		lblPrefix_1.setBounds(270, 180, 40, 21);
 		lblPrefix_1.setText("Prefix:");
 
-		AusgPefixGrund = new Text(shlVlsmAuswahl, SWT.READ_ONLY | SWT.MULTI);
-		AusgPefixGrund.setBounds(316, 180, 33, 24);
+		AusgPrefixGrund = new Text(shlVlsmAuswahl, SWT.READ_ONLY | SWT.MULTI);
+		AusgPrefixGrund.setBounds(316, 180, 33, 24);
 
 		table = new Table(shlVlsmAuswahl, SWT.BORDER | SWT.FULL_SELECTION);
 		table.setBounds(20, 234, 606, 254);
@@ -412,6 +544,54 @@ public class VLSMGui {
 			}
 		}
 		return Zahl;
+	}
+
+	// Wandelt eine dezimale Zahl in eine binäre Zahl um
+	private String LongToBin(long Zahl) {
+		String ZahlBin = "";
+		for (int i = 0; i <= 7; ++i) {
+			if (Zahl - pot(2, 7 - i) >= 0) {
+				Zahl -= pot(2, 7 - i);
+				ZahlBin = ZahlBin.concat("1");
+			} else {
+				ZahlBin = ZahlBin.concat("0");
+			}
+		}
+		return ZahlBin;
+	}
+
+	// Wandelt eine binäre Zahl in eine dezimale Zahl um
+	private long BinToLong(String Binaer) {
+		long Zahl = 0;
+		for (int i = 0; i < Binaer.length(); ++i) {
+			if (Binaer.charAt(Binaer.length() - 1 - i) == '1') {
+				Zahl += pot(2, i);
+			}
+		}
+		return Zahl;
+	}
+
+	// Wandelt die eingegebene IP-Adresse für das Uplink Netzwerk in eine
+	// dezimale Zahl um
+	private long UplinkEingabeIP(int okt1, int okt2, int okt3, int okt4) {
+		String IPAddrBin = "";
+		// Erstes Oktett zur Binären IP-Adresse hinzufügen
+		String OktBin = LongToBin(okt1);
+		IPAddrBin = IPAddrBin.concat(OktBin);
+
+		// Zweites Oktett zur Binären IP-Adresse hinzufügen
+		OktBin = LongToBin(okt2);
+		IPAddrBin = IPAddrBin.concat(OktBin);
+
+		// Drittes Oktett zur Binären IP-Adresse hinzufügen
+		OktBin = LongToBin(okt3);
+		IPAddrBin = IPAddrBin.concat(OktBin);
+
+		// Viertes Oktett zur Binären IP-Adresse hinzufügen
+		OktBin = LongToBin(okt4);
+		IPAddrBin = IPAddrBin.concat(OktBin);
+
+		return BinToLong(IPAddrBin);
 	}
 
 	public boolean getOffen() {
