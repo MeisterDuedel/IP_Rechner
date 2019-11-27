@@ -242,7 +242,6 @@ public class VLSMGui {
 					// Eingegebene IP-Adresse von Dotted-Decimal in dezimale Zahl umwandeln
 					long UplinkIpAddr = UplinkEingabeIP(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
 							UplinkOkt3.getSelection(), UplinkOkt4.getSelection());
-
 					// Prüfen, ob eingegebene IP-Adresse unbedingt als Host-Ip behandelt werden muss
 					if (!btnUplinkDefinitivHost.getSelection()) { // wenn nein
 						// Prüfen, ob kleinstmögliches Netzwerk genommen werden soll
@@ -257,13 +256,26 @@ public class VLSMGui {
 						// Prüfen, ob kleinstmögliches Netzwerk herausgefunden werden soll
 						if (UplinkPrefix.getSelection() == 8) {
 							// wenn ja
-							// Aus 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-Ip-Adresse berechnet
+							
+							// Mit 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-Ip-Adresse berechnet
 							// werden
 							if (UplinkIpAddr == 0) {
 								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
-								warnung.setText("Uplink Adresse = Broadcastadresse");
+								warnung.setText("Berechnung nicht möglich");
 								warnung.setMessage(
-										"Aus der IP-Adresse 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-IP-Adresse berechnet werden!");
+										"Mit der IP-Adresse 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-IP-Adresse berechnet werden!");
+								warnung.open();
+								return;
+							}
+							
+							// Mit 255.255.255.25 kann kein Netzwerk mit 255.255.255.255 als Host-Ip-Adresse berechnet
+							// werden
+							if (UplinkIpAddr == UplinkEingabeIP(255, 255, 255, 255)) {
+								//Ich kann 4294967295 nicht ohne weiteres als Vergleichszahl angeben
+								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
+								warnung.setText("Berechnung nicht möglich");
+								warnung.setMessage(
+										"Mit der IP-Adresse 255.255.255.255 kann kein Netzwerk mit 255.255.255.255 als Host-IP-Adresse berechnet werden!");
 								warnung.open();
 								return;
 							}
@@ -494,6 +506,7 @@ public class VLSMGui {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				AusgabeNetzwerk.AuswahlFertig(GrundNetzwerk.getNetzwerkeAusgewaehlt(), GrundNetzwerk.getNetzwerkeVerfuegbar());
 				VLSMAusgabeGui Ausgabe = new VLSMAusgabeGui();
 				Ausgabe.open();
 			}

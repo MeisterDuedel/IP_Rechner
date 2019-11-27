@@ -3,8 +3,10 @@ package IP_Rechner;
 import java.util.ArrayList;
 
 public class SubnetzeAusgabeNetzwerk extends Netzwerk {
-	private ArrayList<ArrayList<NetzwerkVerfuegbar>> NetzwerkeVerfuegbar = new ArrayList<ArrayList<NetzwerkVerfuegbar>>();
 	// Zeilen = Prefixe, Spalten = Mögliche Subnetze pro Prefix
+	private ArrayList<ArrayList<NetzwerkVerfuegbar>> NetzwerkeVerfuegbar = new ArrayList<ArrayList<NetzwerkVerfuegbar>>();
+	private ArrayList<ArrayList<Netzwerk>> AusgewaehlteSubnetze = new ArrayList<ArrayList<Netzwerk>>();
+	private ArrayList<Netzwerk> FreieSubnetze = new ArrayList<Netzwerk>();
 
 	public SubnetzeAusgabeNetzwerk(int okt1, int okt2, int okt3, int okt4, int Prefix) {
 		super(okt1, okt2, okt3, okt4, Prefix);
@@ -12,6 +14,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		// Instanziiere Die Zeilen (Prefixe) im 2D Array
 		for (int i = 0; i < 30 - Prefix; ++i) {
 			NetzwerkeVerfuegbar.add(new ArrayList<NetzwerkVerfuegbar>());
+			AusgewaehlteSubnetze.add(new ArrayList<Netzwerk>());
 		}
 
 		// Instanziierung Spalten (Subnetze), ein Thread pro Spalte
@@ -49,40 +52,26 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		}
 	}
 
-	// Zählt die noch verfügbaren Subnetze
-	public int[] ZaehleVerfuegbareSubnetze() {
-		int[] Verfuegbar = new int[NetzwerkeVerfuegbar.size()];
-		ArrayList<Thread> Threads = new ArrayList<Thread>();
-		for(int i = 0; i<NetzwerkeVerfuegbar.size();++i) {
-			final int IndexPrefixThread = i;
-			Threads.add(new Thread(new Runnable() {
-				int index = IndexPrefixThread;
-				@Override
-				public void run() {
-					int Zaehler = 0;
-					for(int i = 0; i<NetzwerkeVerfuegbar.get(index).size();++i) {
-						if(NetzwerkeVerfuegbar.get(index).get(i).getVerfuegbar()) {
-							++Zaehler;
-						}
-					}
-					Verfuegbar[index] = Zaehler;	
-				}
-			}));
-			Threads.get(i).start();
-		}
-		for(int i = 0; i<Threads.size();++i) {
-			try {
-				Threads.get(i).join();
-			}catch(InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return Verfuegbar;
-	}
-
-
+	/*
+	 * // Zählt die noch verfügbaren Subnetze private int[]
+	 * ZaehleVerfuegbareSubnetze() { // Array für die Anzahl an verfügbaren
+	 * Subnetzen pro Prefix; int[] Verfuegbar = new int[NetzwerkeVerfuegbar.size()];
+	 * // Threads zum Zählen (ein Thread pro Prefix) ArrayList<Thread> Threads = new
+	 * ArrayList<Thread>(); for (int i = 0; i < NetzwerkeVerfuegbar.size(); ++i) {
+	 * final int IndexPrefixThread = i; // ArrayList(Prefix) Index für den Thread
+	 * Threads.add(new Thread(new Runnable() { // neuer Thread int index =
+	 * IndexPrefixThread;
+	 * 
+	 * @Override public void run() { int Zaehler = 0; for (int i = 0; i <
+	 * NetzwerkeVerfuegbar.get(index).size(); ++i) { if
+	 * (NetzwerkeVerfuegbar.get(index).get(i).getVerfuegbar()) { ++Zaehler; } }
+	 * Verfuegbar[index] = Zaehler; } })); Threads.get(i).start(); // Thread starten
+	 * } // Erst weiter machen, wenn alle Threads fertig sind for (int i = 0; i <
+	 * Threads.size(); ++i) { try { Threads.get(i).join(); } catch
+	 * (InterruptedException e) { e.printStackTrace(); } } return Verfuegbar; }
+	 */
 	// Findet das erste freie Subnetz zu einem Prefix
-	public int FindeFreiesNetzwerk(int IndexPrefix) {
+	private int FindeFreiesNetzwerk(int IndexPrefix) {
 		int i = 0;
 		while (i < NetzwerkeVerfuegbar.get(IndexPrefix).size()
 				&& !NetzwerkeVerfuegbar.get(IndexPrefix).get(i).getVerfuegbar()) {
@@ -93,7 +82,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 
 	// Aktualisiert die Verfügbarkeit der Subnetze, nachdem ein Subnetz zur Auswahl
 	// hinzugefügt wurde
-	public void AktualisiereVerfuegbarkeitHinz(int IndexPrefixBasis, int IndexPosBasis) {
+	private void AktualisiereVerfuegbarkeitHinz(int IndexPrefixBasis, int IndexPosBasis) {
 		/*
 		 * ArrayList für die Threads zur Aktualisierung der Verfügbarkeiten. Vorwärts:
 		 * Ein Thread pro Prefix Rückwärts: Ein Thread für alle Prefixe (es muss nur ein
@@ -166,7 +155,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 	// Belegt das Uplink-Netzwerk
 	public void BelegeUplinkSubnetz(long NetzwerkADDR, int IndexPrefix) {
 		int pos = 0;
-		//Finde das Netzwerk im Prefix
+		// Finde das Netzwerk im Prefix
 		while (pos < NetzwerkeVerfuegbar.get(IndexPrefix).size()
 				&& NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).getNetzwerkAddr() != NetzwerkADDR) {
 			++pos;
@@ -174,6 +163,158 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setUplink(true);
 		NetzwerkeVerfuegbar.get(IndexPrefix).get(pos).setVerfuegbar(false);
 		AktualisiereVerfuegbarkeitHinz(IndexPrefix, pos);
+	}
+
+	// Berechnet die Belegung der ausgewählten und noch freien Subnetze
+	public void AuswahlFertig(int[] parNetzwerkeAusgewaehlt, int[] parNetzwerkeVerfuegbar) {
+		for(int i = 0; i<AusgewaehlteSubnetze.size();++i) {
+			AusgewaehlteSubnetze.get(i).clear();
+		}
+		FreieSubnetze.clear();
+		
+		/*
+		 * Clone die Arrays, in denen die Anzahl der Vefügbaren / Ausgewählten Subnetze
+		 * pro Prefix gespeichert werden, um diese Verändern zu können, ohne dass das
+		 * Original beeinflusst wird
+		 */
+		int[] NetzwerkeAusgewaehlt = parNetzwerkeAusgewaehlt.clone();
+		int[] NetzwerkeUebrig = parNetzwerkeVerfuegbar.clone();
+
+		// Belegung übertragen
+		for (int i = 0; i < NetzwerkeAusgewaehlt.length; ++i) {
+			for (int k = 0; k < NetzwerkeAusgewaehlt[i]; ++k) {
+				BelegeSubnetz(i);
+			}
+		}
+
+		ArrayList<Thread> Threads = new ArrayList<Thread>();
+
+		// Ausgewählte Subnetze (und ggf. Uplink-Netzwerk) von NetzwerkeVerfuegbar in
+		// AusgewaehlteSubnetze übertragen
+		for (int i = 0; i < NetzwerkeAusgewaehlt.length; ++i) {
+			final int IndexPrefixThread = i; // ArrayList Index für Thread
+			Threads.add(new Thread(new Runnable() { // neuer Thread
+				int index = IndexPrefixThread;
+
+				@Override
+				public void run() {
+					for (int i = 0; i < NetzwerkeVerfuegbar.get(index).size(); ++i) {
+						if (NetzwerkeVerfuegbar.get(index).get(i).getManuell()
+								|| NetzwerkeVerfuegbar.get(index).get(i).getUplink()) {
+							AusgewaehlteSubnetze.get(i).add(NetzwerkeVerfuegbar.get(index).get(i));
+						}
+					}
+				}
+			}));
+			Threads.get(Threads.size() - 1).start(); // thread starten
+		}
+		// Erst weiter machen, wenn alle Threads fertig sind
+		for (int i = 0; i < Threads.size(); ++i) {
+			try {
+				Threads.get(i).join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Freie Subnetze zusammenfassen und in FreieSubnetze übertragen
+		int SummeUebrig = 0;
+		do {
+			SummeUebrig = 0;
+			// Zählen, wie viele Subnetze noch verfügbar sind
+			for (int i = 0; i < NetzwerkeUebrig.length; ++i) {
+				SummeUebrig += NetzwerkeUebrig[i];
+			}
+			if (SummeUebrig > 0) {
+				// Das größte freie Netzwerk finden
+				int i = 0;
+				while (i < NetzwerkeUebrig.length && NetzwerkeUebrig[i] == 0) {
+					++i;
+				}
+				int pos = FindeFreiesNetzwerk(i);
+				// Füge größtes freie Netzwerk zu FreieSubnetze hinzu
+				FreieSubnetze.add(NetzwerkeVerfuegbar.get(i).get(pos));
+				// Belege größtes freie Netzwerk in NetzwerkeVerfuegbar
+				NetzwerkeVerfuegbar.get(i).get(pos).setVerfuegbar(false);
+				AktualisiereVerfuegbarkeitHinz(i, pos);
+
+				// Aktualisiere Zählerarray
+				NetzwerkeUebrig[i] -= 1; // Belege Subnetz im Zähler-Array
+
+				// Aktualisiere die Anzahl der verfügbaren Subnetze in den nachfolgenden
+				// Prefixen
+				for (int k = 0; k < 30 - getPrefix() - i - 1; ++k) {
+					NetzwerkeUebrig[i + k + 1] -= potint(2, k + 1);
+				}
+
+				// Aktualisiere die Anzahl der verfügbaren Subnetze in den vorhergehenden
+				// Prefixen
+				for (int k = i - 1; k >= 0; --k) {
+					/*
+					 * Wenn die Anzahl an verfügbaren Subnetzen im nachfolgenden Prefix kleiner als
+					 * 2* die (noch) aktuelle Anzahl an möglichen Subnetzen im Prefix ist
+					 */
+					if (NetzwerkeUebrig[k + 1] < 2 * NetzwerkeUebrig[k]) {
+						NetzwerkeUebrig[k] -= 1;
+					}
+				}
+			}
+
+		} while (SummeUebrig > 0); // Solange noch Subnetze Verfügbar sind
+
+		Threads.clear();
+
+		// Thread zum Zurücksetzen der Belegung in NetzwerkeVerfuegbar
+		Thread SubnetzeZuruecksetzen = new Thread(new Runnable() {
+			boolean uplink = false; // Ob ein Uplink Netzwerk gefunden wurde
+			int uplinkPrefix = 0; // Prefix(Index) des Uplink-Netzwerks
+			int uplinkPos = 0; // Position des Uplink-Netzwerks im Prefix
+
+			@Override
+			public void run() {
+				ArrayList<Thread> ThreadsZuruecksetzen = new ArrayList<Thread>();
+				// Setze Belegung in NetzwerkeVerfuegbar zurück (Damit es keine Probleme gibt,
+				// wenn der Benutzer in der Auswahl etwas ändert)
+				// Ein Thread pro Prefix
+				for (int i = 0; i < NetzwerkeVerfuegbar.size(); ++i) {
+					final int IndexPrefixThread = i;
+					ThreadsZuruecksetzen.add(new Thread(new Runnable() {
+						int index = IndexPrefixThread;
+
+						@Override
+						public void run() {
+							// Setze alle Subnetze zurück bis auf Uplink
+							for (int i = 0; i < NetzwerkeVerfuegbar.get(index).size(); ++i) {
+								if (!NetzwerkeVerfuegbar.get(index).get(i).getUplink()) {
+									NetzwerkeVerfuegbar.get(index).get(i).setManuell(false);
+									NetzwerkeVerfuegbar.get(index).get(i).setVerfuegbar(true);
+								} else {
+									// Wenn Thread das Uplink Netzwerk findet
+									uplink = true;
+									uplinkPrefix = index;
+									uplinkPos = i;
+								}
+							}
+
+						}
+					}));
+					ThreadsZuruecksetzen.get(ThreadsZuruecksetzen.size() - 1).start();
+				}
+				// Dieser Thread soll erst weitermachen, wenn alle Threads fertig sind
+				for (int i = 0; i < ThreadsZuruecksetzen.size(); ++i) {
+					try {
+						ThreadsZuruecksetzen.get(i).join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				//Wenn ein Uplink Netzwerk gefunden wurde
+				if (uplink) {
+					AktualisiereVerfuegbarkeitHinz(uplinkPrefix, uplinkPos);
+				}
+			}
+		});
+		SubnetzeZuruecksetzen.start();
 	}
 
 	// Funktion für Potenzrechnung mit Integern
@@ -187,6 +328,14 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 			}
 		}
 		return Zahl;
+	}
+
+	public ArrayList<ArrayList<Netzwerk>> getAusgewaehlteSubnetze() {
+		return AusgewaehlteSubnetze;
+	}
+
+	public ArrayList<Netzwerk> getFreieSubnetze() {
+		return FreieSubnetze;
 	}
 
 }
