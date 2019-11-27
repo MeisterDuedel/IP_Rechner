@@ -256,7 +256,7 @@ public class VLSMGui {
 						// Prüfen, ob kleinstmögliches Netzwerk herausgefunden werden soll
 						if (UplinkPrefix.getSelection() == 8) {
 							// wenn ja
-							
+
 							// Mit 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-Ip-Adresse berechnet
 							// werden
 							if (UplinkIpAddr == 0) {
@@ -267,11 +267,12 @@ public class VLSMGui {
 								warnung.open();
 								return;
 							}
-							
-							// Mit 255.255.255.25 kann kein Netzwerk mit 255.255.255.255 als Host-Ip-Adresse berechnet
+
+							// Mit 255.255.255.25 kann kein Netzwerk mit 255.255.255.255 als Host-Ip-Adresse
+							// berechnet
 							// werden
 							if (UplinkIpAddr == UplinkEingabeIP(255, 255, 255, 255)) {
-								//Ich kann 4294967295 nicht ohne weiteres als Vergleichszahl angeben
+								// Ich kann 4294967295 nicht ohne weiteres als Vergleichszahl angeben
 								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 								warnung.setText("Berechnung nicht möglich");
 								warnung.setMessage(
@@ -506,9 +507,15 @@ public class VLSMGui {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AusgabeNetzwerk.AuswahlFertig(GrundNetzwerk.getNetzwerkeAusgewaehlt(), GrundNetzwerk.getNetzwerkeVerfuegbar());
-				VLSMAusgabeGui Ausgabe = new VLSMAusgabeGui();
+				lblAusgabeStatus.setText("Berechne Ausgabe");
+				AusgabeNetzwerk.AuswahlFertig(GrundNetzwerk.getNetzwerkeAusgewaehlt(),
+						GrundNetzwerk.getNetzwerkeVerfuegbar());
+				VLSMAusgabeGui Ausgabe = new VLSMAusgabeGui(AusgabeNetzwerk.getAusgewaehlteSubnetze(),
+						AusgabeNetzwerk.getFreieSubnetze(), AusgabeNetzwerk.getNetzwerkAddrDD(),
+						AusgabeNetzwerk.getPrefix());
+				lblAusgabeStatus.setText("Ausgabe geöffnet");
 				Ausgabe.open();
+				lblAusgabeStatus.setText("Bereit");
 			}
 
 		});

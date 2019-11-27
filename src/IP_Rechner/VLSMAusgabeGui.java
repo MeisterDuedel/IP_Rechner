@@ -4,6 +4,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
+
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Table;
@@ -18,6 +21,18 @@ public class VLSMAusgabeGui {
 	private Text AusgPrefix;
 	private Table tableSubnetze;
 	private Table tableUnbelegt;
+	private ArrayList<ArrayList<Netzwerk>> Subnetze;
+	private ArrayList<Netzwerk> FreieSubnetze;
+	private String NetzwerkadresseGrundnetzwerk;
+	private int PrefixGrundnetzwerk;
+
+	public VLSMAusgabeGui(ArrayList<ArrayList<Netzwerk>> SubAusgewaehlt, ArrayList<Netzwerk> SubFrei,
+			String NetzwerkAddrGrund, int PrefixGrund) {
+		Subnetze = SubAusgewaehlt;
+		FreieSubnetze = SubFrei;
+		NetzwerkadresseGrundnetzwerk = NetzwerkAddrGrund;
+		PrefixGrundnetzwerk = PrefixGrund;
+	}
 
 	/**
 	 * Open the window.
@@ -147,5 +162,47 @@ public class VLSMAusgabeGui {
 		btnHTML.setBounds(30, 584, 859, 26);
 		btnHTML.setText("Als HTML Speichern");
 
+		ausgabe();
+	}
+
+	private void ausgabe() {
+		AusgNetzwerk.setText(NetzwerkadresseGrundnetzwerk);
+		AusgPrefix.setText("/".concat(Integer.toString(PrefixGrundnetzwerk)));
+		System.out.println(Subnetze.size());
+		for (int i = 0; i < Subnetze.size(); ++i) {
+			for (int k = 0; k < Subnetze.get(i).size(); ++k) {
+				TableItem eintrag = new TableItem(tableSubnetze, SWT.NONE);
+				eintrag.setText(0, Subnetze.get(i).get(k).getNetzwerkAddrDD());
+				eintrag.setText(1, Subnetze.get(i).get(k).getSubnetzmaskeDD());
+				eintrag.setText(2, "/".concat(Integer.toString(Subnetze.get(i).get(k).getPrefix())));
+				eintrag.setText(3, Subnetze.get(i).get(k).getBroadcastDD());
+				eintrag.setText(4, Subnetze.get(i).get(k).getMinHostDD());
+				eintrag.setText(5, Subnetze.get(i).get(k).getMaxHostDD());
+				eintrag.setText(6, Long.toString(pot(2, 32 - Subnetze.get(i).get(k).getPrefix()) - 2));
+			}
+		}
+		for (int i = 0; i < FreieSubnetze.size(); ++i) {
+			TableItem eintrag = new TableItem(tableUnbelegt, SWT.NONE);
+			eintrag.setText(0, FreieSubnetze.get(i).getNetzwerkAddrDD());
+			eintrag.setText(1, FreieSubnetze.get(i).getSubnetzmaskeDD());
+			eintrag.setText(2, "/".concat(Integer.toString(FreieSubnetze.get(i).getPrefix())));
+			eintrag.setText(3, FreieSubnetze.get(i).getBroadcastDD());
+			eintrag.setText(4, FreieSubnetze.get(i).getMinHostDD());
+			eintrag.setText(5, FreieSubnetze.get(i).getMaxHostDD());
+			eintrag.setText(6, Long.toString(pot(2, 32 - FreieSubnetze.get(i).getPrefix()) - 2));
+		}
+	}
+
+	// Funktion für Potenzrechnung
+	private long pot(long Basis, int Exponent) {
+		long Zahl = Basis;
+		if (Exponent == 0) {
+			Zahl = 1;
+		} else {
+			for (int i = 1; i < Exponent; ++i) {
+				Zahl *= Basis;
+			}
+		}
+		return Zahl;
 	}
 }

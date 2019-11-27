@@ -5,7 +5,10 @@ import java.util.ArrayList;
 public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 	// Zeilen = Prefixe, Spalten = Mögliche Subnetze pro Prefix
 	private ArrayList<ArrayList<NetzwerkVerfuegbar>> NetzwerkeVerfuegbar = new ArrayList<ArrayList<NetzwerkVerfuegbar>>();
+
+	// 2 Dimensional, damit ich mit Threads arbeiten kann
 	private ArrayList<ArrayList<Netzwerk>> AusgewaehlteSubnetze = new ArrayList<ArrayList<Netzwerk>>();
+
 	private ArrayList<Netzwerk> FreieSubnetze = new ArrayList<Netzwerk>();
 
 	public SubnetzeAusgabeNetzwerk(int okt1, int okt2, int okt3, int okt4, int Prefix) {
@@ -167,13 +170,15 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 
 	// Berechnet die Belegung der ausgewählten und noch freien Subnetze
 	public void AuswahlFertig(int[] parNetzwerkeAusgewaehlt, int[] parNetzwerkeVerfuegbar) {
-		for(int i = 0; i<AusgewaehlteSubnetze.size();++i) {
+		// Lösche alle Subnetze aus den Ausgabearrays (wenn welche von einer vorherigen
+		// Ausgabe noch drin sind)
+		for (int i = 0; i < AusgewaehlteSubnetze.size(); ++i) {
 			AusgewaehlteSubnetze.get(i).clear();
 		}
 		FreieSubnetze.clear();
-		
+
 		/*
-		 * Clone die Arrays, in denen die Anzahl der Vefügbaren / Ausgewählten Subnetze
+		 * Klone die Arrays, in denen die Anzahl der Vefügbaren / Ausgewählten Subnetze
 		 * pro Prefix gespeichert werden, um diese Verändern zu können, ohne dass das
 		 * Original beeinflusst wird
 		 */
@@ -201,7 +206,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 					for (int i = 0; i < NetzwerkeVerfuegbar.get(index).size(); ++i) {
 						if (NetzwerkeVerfuegbar.get(index).get(i).getManuell()
 								|| NetzwerkeVerfuegbar.get(index).get(i).getUplink()) {
-							AusgewaehlteSubnetze.get(i).add(NetzwerkeVerfuegbar.get(index).get(i));
+							AusgewaehlteSubnetze.get(index).add(NetzwerkeVerfuegbar.get(index).get(i));
 						}
 					}
 				}
@@ -232,9 +237,9 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 					++i;
 				}
 				int pos = FindeFreiesNetzwerk(i);
-				// Füge größtes freie Netzwerk zu FreieSubnetze hinzu
+				// Füge größtes freies Netzwerk zu FreieSubnetze hinzu
 				FreieSubnetze.add(NetzwerkeVerfuegbar.get(i).get(pos));
-				// Belege größtes freie Netzwerk in NetzwerkeVerfuegbar
+				// Belege größtes freies Netzwerk in NetzwerkeVerfuegbar
 				NetzwerkeVerfuegbar.get(i).get(pos).setVerfuegbar(false);
 				AktualisiereVerfuegbarkeitHinz(i, pos);
 
@@ -299,6 +304,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 						}
 					}));
 					ThreadsZuruecksetzen.get(ThreadsZuruecksetzen.size() - 1).start();
+					
 				}
 				// Dieser Thread soll erst weitermachen, wenn alle Threads fertig sind
 				for (int i = 0; i < ThreadsZuruecksetzen.size(); ++i) {
@@ -308,13 +314,15 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 						e.printStackTrace();
 					}
 				}
-				//Wenn ein Uplink Netzwerk gefunden wurde
+				// Wenn ein Uplink Netzwerk gefunden wurde
 				if (uplink) {
 					AktualisiereVerfuegbarkeitHinz(uplinkPrefix, uplinkPos);
 				}
 			}
 		});
 		SubnetzeZuruecksetzen.start();
+		/*Auf den Thread zum Zurücksetzen der Belegung muss nicht gewartet werden,
+		 * er soll nur im Hintergrund laufen*/
 	}
 
 	// Funktion für Potenzrechnung mit Integern

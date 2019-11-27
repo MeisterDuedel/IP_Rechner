@@ -79,11 +79,12 @@ public class GrundNetzwerk {
 			}
 		}
 	}
-	
-	// Belegt das Uplink-Netzwerk und aktualisiert die Verfügbarkeit der übrigen Subnetze
+
+	// Belegt das Uplink-Netzwerk und aktualisiert die Verfügbarkeit der übrigen
+	// Subnetze
 	public void BelegeUplinkSubnetz(int IndexPrefix) {
 		NetzwerkeVerfuegbar[IndexPrefix] -= 1; // Belege Subnetz
-		
+
 		// Aktualisiere die Anzahl der verfügbaren Subnetze in den nachfolgenden
 		// Prefixen
 		for (int i = 0; i < 30 - Prefix - IndexPrefix - 1; ++i) {
