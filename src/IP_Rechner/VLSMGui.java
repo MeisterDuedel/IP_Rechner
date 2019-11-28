@@ -39,6 +39,9 @@ public class VLSMGui {
 	private boolean offen;
 	private GrundNetzwerk GrundNetzwerk;
 	private SubnetzeAusgabeNetzwerk AusgabeNetzwerk;
+	private Button btnAusgabe;
+	private Button btnEntfernen;
+	private Button btnHinzfg;
 
 	public VLSMGui() {
 		offen = false;
@@ -236,6 +239,10 @@ public class VLSMGui {
 					AusgabePrefixUplink.setText("");
 					AusgNetzUplink.setText("");
 					ausgabeAktualisieren();
+					// Buttons aktivieren
+					btnHinzfg.setEnabled(true);
+					btnEntfernen.setEnabled(true);
+					btnAusgabe.setEnabled(true);
 					lblAusgabeStatus.setText("Bereit");
 				} else { // wenn ja
 					int UplinkNetzwerkPrefix = 0;
@@ -373,6 +380,10 @@ public class VLSMGui {
 					AusgPrefix = "/".concat(Integer.toString(dummyUplink.getPrefix()));
 					AusgabePrefixUplink.setText(AusgPrefix);
 					ausgabeAktualisieren();
+					// Buttons aktivieren
+					btnHinzfg.setEnabled(true);
+					btnEntfernen.setEnabled(true);
+					btnAusgabe.setEnabled(true);
 					lblAusgabeStatus.setText("Bereit");
 				}
 			}
@@ -435,7 +446,8 @@ public class VLSMGui {
 		AusgabePrefixUplink = new Text(shlVlsmAuswahl, SWT.READ_ONLY | SWT.MULTI);
 		AusgabePrefixUplink.setBounds(357, 208, 33, 24);
 
-		Button btnHinzfg = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnHinzfg = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnHinzfg.setEnabled(false);
 		btnHinzfg.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -468,7 +480,8 @@ public class VLSMGui {
 		btnHinzfg.setBounds(30, 494, 191, 26);
 		btnHinzfg.setText("1x Zur Auswahl hinzuf\u00FCgen");
 
-		Button btnEntfernen = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnEntfernen = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnEntfernen.setEnabled(false);
 		btnEntfernen.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -502,14 +515,17 @@ public class VLSMGui {
 		btnEntfernen.setBounds(227, 494, 191, 26);
 		btnEntfernen.setText("1x Aus Auswahl entfernen");
 
-		Button btnAusgabe = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnAusgabe = new Button(shlVlsmAuswahl, SWT.NONE);
+		btnAusgabe.setEnabled(false);
 		btnAusgabe.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				lblAusgabeStatus.setText("Berechne Ausgabe");
+				// Auswahl übertragen
 				AusgabeNetzwerk.AuswahlFertig(GrundNetzwerk.getNetzwerkeAusgewaehlt(),
 						GrundNetzwerk.getNetzwerkeVerfuegbar());
+				// Ausgabe öffnen
 				VLSMAusgabeGui Ausgabe = new VLSMAusgabeGui(AusgabeNetzwerk.getAusgewaehlteSubnetze(),
 						AusgabeNetzwerk.getFreieSubnetze(), AusgabeNetzwerk.getNetzwerkAddrDD(),
 						AusgabeNetzwerk.getPrefix());

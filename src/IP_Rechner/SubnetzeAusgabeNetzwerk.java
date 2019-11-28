@@ -304,7 +304,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 						}
 					}));
 					ThreadsZuruecksetzen.get(ThreadsZuruecksetzen.size() - 1).start();
-					
+
 				}
 				// Dieser Thread soll erst weitermachen, wenn alle Threads fertig sind
 				for (int i = 0; i < ThreadsZuruecksetzen.size(); ++i) {
@@ -316,13 +316,17 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 				}
 				// Wenn ein Uplink Netzwerk gefunden wurde
 				if (uplink) {
+					// Da alle Subnetze zurückgesetzt wurden, muss die Verfügbarkeit der Subnetze,
+					// die durch das Uplink-Netzwerk blockert werden, aktualisiert werden
 					AktualisiereVerfuegbarkeitHinz(uplinkPrefix, uplinkPos);
 				}
 			}
 		});
 		SubnetzeZuruecksetzen.start();
-		/*Auf den Thread zum Zurücksetzen der Belegung muss nicht gewartet werden,
-		 * er soll nur im Hintergrund laufen*/
+		/*
+		 * Auf den Thread zum Zurücksetzen der Belegung muss nicht gewartet werden, er
+		 * soll nur im Hintergrund laufen
+		 */
 	}
 
 	// Funktion für Potenzrechnung mit Integern

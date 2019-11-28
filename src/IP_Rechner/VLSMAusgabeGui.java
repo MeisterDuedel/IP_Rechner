@@ -168,7 +168,7 @@ public class VLSMAusgabeGui {
 	private void ausgabe() {
 		AusgNetzwerk.setText(NetzwerkadresseGrundnetzwerk);
 		AusgPrefix.setText("/".concat(Integer.toString(PrefixGrundnetzwerk)));
-		System.out.println(Subnetze.size());
+		// Ausgewählte Subnetze ausgeben
 		for (int i = 0; i < Subnetze.size(); ++i) {
 			for (int k = 0; k < Subnetze.get(i).size(); ++k) {
 				TableItem eintrag = new TableItem(tableSubnetze, SWT.NONE);
@@ -178,9 +178,11 @@ public class VLSMAusgabeGui {
 				eintrag.setText(3, Subnetze.get(i).get(k).getBroadcastDD());
 				eintrag.setText(4, Subnetze.get(i).get(k).getMinHostDD());
 				eintrag.setText(5, Subnetze.get(i).get(k).getMaxHostDD());
+				// Anzahl möglicher Hosts
 				eintrag.setText(6, Long.toString(pot(2, 32 - Subnetze.get(i).get(k).getPrefix()) - 2));
 			}
 		}
+		// Freie Subnetze ausgeben
 		for (int i = 0; i < FreieSubnetze.size(); ++i) {
 			TableItem eintrag = new TableItem(tableUnbelegt, SWT.NONE);
 			eintrag.setText(0, FreieSubnetze.get(i).getNetzwerkAddrDD());
@@ -189,6 +191,7 @@ public class VLSMAusgabeGui {
 			eintrag.setText(3, FreieSubnetze.get(i).getBroadcastDD());
 			eintrag.setText(4, FreieSubnetze.get(i).getMinHostDD());
 			eintrag.setText(5, FreieSubnetze.get(i).getMaxHostDD());
+			// Anzahl möglicher Hosts
 			eintrag.setText(6, Long.toString(pot(2, 32 - FreieSubnetze.get(i).getPrefix()) - 2));
 		}
 	}
