@@ -4,9 +4,6 @@ public class Netzwerk {
 
 	private long Netzwerkaddr;
 	private int Prefix;
-	// private long Broadcast;
-	// private long MinHost;
-	// private long MaxHost;
 
 	// Konstruktor für VLSM
 	public Netzwerk(long Adresse, int Prefix) {
@@ -48,7 +45,7 @@ public class Netzwerk {
 	}
 
 	// Wandelt eine dezimale Zahl in eine binäre Zahl um
-	public String LongToBin(long Zahl, boolean Adresse) {
+	protected String LongToBin(long Zahl, boolean Adresse) {
 		int MaxExponent = 0;
 		if (Adresse) {
 			MaxExponent = 31; // Größter Exponent bei Adressen
@@ -68,7 +65,7 @@ public class Netzwerk {
 	}
 
 	// Wandelt eine binäre Zahl in eine dezimale Zahl um
-	public long BinToLong(String Binaer) {
+	protected long BinToLong(String Binaer) {
 		long Zahl = 0;
 		for (int i = 0; i < Binaer.length(); ++i) {
 			if (Binaer.charAt(Binaer.length() - 1 - i) == '1') {
@@ -79,7 +76,7 @@ public class Netzwerk {
 	}
 
 	// Wandelt eine Binäre Adresse in dotted-decimal um
-	public String BinToAddr(String Binaer) {
+	protected String BinToAddr(String Binaer) {
 		String Adresse = "";
 		for (int i = 1; i <= 4; ++i) {
 			long okt = BinToLong(Binaer.substring((i * 8) - 8, i * 8));
@@ -92,7 +89,7 @@ public class Netzwerk {
 	}
 
 	// Wandelt einen Prefix in eine binäre Subnetzmaske um
-	public String PrefixToBin(int Prefix) {
+	protected String PrefixToBin(int Prefix) {
 		String PrefixBin = "";
 		for (int i = 0; i < Prefix; ++i) {
 			PrefixBin = PrefixBin.concat("1");
@@ -180,27 +177,6 @@ public class Netzwerk {
 
 	public long getBroadcast() {
 		return Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1);
-	}
-
-	public long getMinHost() {
-		long MinHost = 0;
-		if (Prefix < 31) {
-			MinHost = Netzwerkaddr + +1;
-		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
-			MinHost = 0;
-		}
-
-		return MinHost;
-	}
-
-	public long getMaxHost() {
-		long MaxHost = 0;
-		if (Prefix < 31) {
-			MaxHost = (Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1)) - 1;
-		} else { // Ein /31 Netzwerk hat nur Netzwerkadresse und Broadcastadresse
-			MaxHost = 0;
-		}
-		return MaxHost;
 	}
 
 }

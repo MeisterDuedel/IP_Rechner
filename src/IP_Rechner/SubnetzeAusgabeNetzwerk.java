@@ -55,24 +55,7 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		}
 	}
 
-	/*
-	 * // Zählt die noch verfügbaren Subnetze private int[]
-	 * ZaehleVerfuegbareSubnetze() { // Array für die Anzahl an verfügbaren
-	 * Subnetzen pro Prefix; int[] Verfuegbar = new int[NetzwerkeVerfuegbar.size()];
-	 * // Threads zum Zählen (ein Thread pro Prefix) ArrayList<Thread> Threads = new
-	 * ArrayList<Thread>(); for (int i = 0; i < NetzwerkeVerfuegbar.size(); ++i) {
-	 * final int IndexPrefixThread = i; // ArrayList(Prefix) Index für den Thread
-	 * Threads.add(new Thread(new Runnable() { // neuer Thread int index =
-	 * IndexPrefixThread;
-	 * 
-	 * @Override public void run() { int Zaehler = 0; for (int i = 0; i <
-	 * NetzwerkeVerfuegbar.get(index).size(); ++i) { if
-	 * (NetzwerkeVerfuegbar.get(index).get(i).getVerfuegbar()) { ++Zaehler; } }
-	 * Verfuegbar[index] = Zaehler; } })); Threads.get(i).start(); // Thread starten
-	 * } // Erst weiter machen, wenn alle Threads fertig sind for (int i = 0; i <
-	 * Threads.size(); ++i) { try { Threads.get(i).join(); } catch
-	 * (InterruptedException e) { e.printStackTrace(); } } return Verfuegbar; }
-	 */
+	
 	// Findet das erste freie Subnetz zu einem Prefix
 	private int FindeFreiesNetzwerk(int IndexPrefix) {
 		int i = 0;
