@@ -142,6 +142,5 @@ public class mainGui {
 		});
 		btnAnzahlHosts.setBounds(90, 133, 250, 26);
 		btnAnzahlHosts.setText("Anzahl Hosts -> Prefix");
-
 	}
 }
