@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/*Berechnung des Prefixes zu einer vom Benutzer eingegebenen Subnetzmaske*/
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -46,7 +46,7 @@ public class SubnetzPrefixGui {
 	 * @wbp.parser.entryPoint
 	 */
 	protected void createContents() {
-		shlSubnetzmaskeZuPrefix = new Shell();
+		shlSubnetzmaskeZuPrefix = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shlSubnetzmaskeZuPrefix.setImage(SWTResourceManager.getImage(SubnetzPrefixGui.class, "/Icons/IP_Rechner.ico"));
 		shlSubnetzmaskeZuPrefix.setText("Subnetzmaske zu Prefix");
 		shlSubnetzmaskeZuPrefix.setSize(403, 174);
@@ -100,29 +100,32 @@ public class SubnetzPrefixGui {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String SubnetzmaskeBin = "";
-				// Erstes Oktett zur Binären Subnetzmaske hinzufügen
+				// Erstes Oktett zur binären Subnetzmaske hinzufügen
 				String OktBin = LongToBin(okt1.getSelection());
 				SubnetzmaskeBin = SubnetzmaskeBin.concat(OktBin);
 
-				// Zweites Oktett zur Binären Subnetzmaske hinzufügen
+				// Zweites Oktett zur binären Subnetzmaske hinzufügen
 				OktBin = LongToBin(okt2.getSelection());
 				SubnetzmaskeBin = SubnetzmaskeBin.concat(OktBin);
 
-				// Drittes Oktett zur Binären Subnetzmaske hinzufügen
+				// Drittes Oktett zur binären Subnetzmaske hinzufügen
 				OktBin = LongToBin(okt3.getSelection());
 				SubnetzmaskeBin = SubnetzmaskeBin.concat(OktBin);
 
-				// Viertes Oktett zur Binären Subnetzmaske hinzufügen
+				// Viertes Oktett zur binären Subnetzmaske hinzufügen
 				OktBin = LongToBin(okt4.getSelection());
 				SubnetzmaskeBin = SubnetzmaskeBin.concat(OktBin);
 
 				if (!eingabePruefen(SubnetzmaskeBin)) {
+					// Wenn Eingabe keine gültige Subnetzmaske, Warnung ausgeben
 					MessageBox warnung = new MessageBox(shlSubnetzmaskeZuPrefix, SWT.ICON_WARNING | SWT.OK);
 					warnung.setText("Fehlerhafte Eingabe");
 					warnung.setMessage("Die Eingabe ist keine gültige Subnetzmaske!");
 					warnung.open();
 				} else {
+					// Prefix berechnen
 					int prefix = berechnePrefix(SubnetzmaskeBin);
+					// Füge Oktette für Ausgabe zusammen
 					String Ausgabe = "";
 					Ausgabe = Ausgabe.concat(Integer.toString(okt1.getSelection()));
 					Ausgabe = Ausgabe.concat(".");
@@ -176,7 +179,7 @@ public class SubnetzPrefixGui {
 		return Zahl;
 	}
 
-	// Brüft, ob die Eingabe eine Gültige Subnetzmaske ist
+	// Prüft, ob die Eingabe eine Gültige Subnetzmaske ist
 	private boolean eingabePruefen(String SubnetzmaskeBin) {
 		int i = 0;
 		while (i < 32 && SubnetzmaskeBin.charAt(i) == '1') {
@@ -194,7 +197,7 @@ public class SubnetzPrefixGui {
 		}
 	}
 
-	// Berechnet aus der Binären Subnetzmaske den Prefix
+	// Berechnet aus der binären Subnetzmaske den Prefix
 	private int berechnePrefix(String SubnetzmaskeBin) {
 		int i = 0;
 		while (i < 32 && SubnetzmaskeBin.charAt(i) == '1') {

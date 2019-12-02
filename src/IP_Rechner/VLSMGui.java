@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/*Auswahlfenster für VLSM*/
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
@@ -36,12 +36,12 @@ public class VLSMGui {
 	private Label lblUplinknetzwerkadresse;
 	private Label lblPrefixUplink_1;
 	private Label lblAusgabeStatus;
-	private boolean offen;
-	private GrundNetzwerk GrundNetzwerk;
-	private SubnetzeAusgabeNetzwerk AusgabeNetzwerk;
 	private Button btnAusgabe;
 	private Button btnEntfernen;
 	private Button btnHinzfg;
+	private boolean offen;
+	private GrundNetzwerk GrundNetzwerk;
+	private SubnetzeAusgabeNetzwerk AusgabeNetzwerk;
 
 	public VLSMGui() {
 		offen = false;
@@ -70,7 +70,7 @@ public class VLSMGui {
 	 * @wbp.parser.entryPoint
 	 */
 	protected void createContents() {
-		shlVlsmAuswahl = new Shell();
+		shlVlsmAuswahl = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shlVlsmAuswahl.setImage(SWTResourceManager.getImage(VLSMGui.class, "/Icons/IP_Rechner.ico"));
 		shlVlsmAuswahl.setSize(662, 604);
 		shlVlsmAuswahl.setText("VLSM Auswahl");
@@ -270,12 +270,13 @@ public class VLSMGui {
 								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 								warnung.setText("Berechnung nicht möglich");
 								warnung.setMessage(
-										"Mit der IP-Adresse 0.0.0.0 kann kein Netzwerk mit 0.0.0.0 als Host-IP-Adresse berechnet werden!");
+										"Mit der IP-Adresse 0.0.0.0 kann kein Netzwerk, in dem 0.0.0.0 eine Host-IP-Adresse ist, berechnet werden!");
 								warnung.open();
 								return;
 							}
 
-							// Mit 255.255.255.25 kann kein Netzwerk mit 255.255.255.255 als Host-Ip-Adresse
+							// Mit 255.255.255.255 kann kein Netzwerk mit 255.255.255.255 als
+							// Host-Ip-Adresse
 							// berechnet
 							// werden
 							if (UplinkIpAddr == UplinkEingabeIP(255, 255, 255, 255)) {
@@ -283,7 +284,7 @@ public class VLSMGui {
 								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 								warnung.setText("Berechnung nicht möglich");
 								warnung.setMessage(
-										"Mit der IP-Adresse 255.255.255.255 kann kein Netzwerk mit 255.255.255.255 als Host-IP-Adresse berechnet werden!");
+										"Mit der IP-Adresse 255.255.255.255 kann kein Netzwerk, in dem 255.255.255.255 eine Host-IP-Adresse ist, berechnet werden!");
 								warnung.open();
 								return;
 							}
@@ -302,16 +303,18 @@ public class VLSMGui {
 							UplinkNetzwerkPrefix = UplinkPrefix.getSelection();
 							Netzwerk dummy = new Netzwerk(UplinkOkt1.getSelection(), UplinkOkt2.getSelection(),
 									UplinkOkt3.getSelection(), UplinkOkt4.getSelection(), UplinkNetzwerkPrefix);
-							// Prüfe, ob Eingegebene IP-Adresse nicht die eine Netzwerkadresse ist
+							// Prüfe, ob Eingegebene IP-Adresse nicht doch eine Netzwerkadresse ist
 							if (dummy.getNetzwerkAddr() == UplinkIpAddr) {
+								// wenn ja, Warnung ausgeben
 								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 								warnung.setText("Uplink Adresse = Netzwerkadresse");
 								warnung.setMessage(
 										"Die eingegebene IP-Adresse für das Uplink-Netzwerk ist eine Netzwerkadresse! Vorgang wird abgebrochen!");
 								warnung.open();
 								return;
-								// Prüfe, ob Eingegebene IP-Adresse nicht die eine Broadcastadresse ist
+								// Prüfe, ob Eingegebene IP-Adresse nicht doch eine Broadcastadresse ist
 							} else if (dummy.getBroadcast() == UplinkIpAddr) {
+								// wenn ja, Warnung ausgeben
 								MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 								warnung.setText("Uplink Adresse = Broadcastadresse");
 								warnung.setMessage(
@@ -347,6 +350,7 @@ public class VLSMGui {
 					// Prüfen, ob Uplink-Netzwerk nicht im Grundnetzwerk liegt
 					if (dummyUplink.getNetzwerkAddr() < dummyNetzwerk.getNetzwerkAddr()
 							|| dummyUplink.getNetzwerkAddr() > dummyNetzwerk.getBroadcast()) {
+						// Wenn ja, Warnung ausgeben
 						String Ausgabe = "Das Uplink-Netzwerk ".concat(dummyUplink.getNetzwerkAddrDD()).concat(", /")
 								.concat(Integer.toString(UplinkNetzwerkPrefix))
 								.concat(" liegt nicht innerhalb des Grund-Netzwerks!");
@@ -455,12 +459,14 @@ public class VLSMGui {
 				if (table.getSelectionIndex() > -1) {
 					// Testen, ob noch ein Subnetz im Prefix verfügbar ist
 					if (Integer.parseInt(table.getItem(table.getSelectionIndex()).getText(2)) > 0) {
+						// wenn ja
 						lblAusgabeStatus.setText("Belege Subnetz");
 						GrundNetzwerk.BelegeSubnetz(table.getSelectionIndex()); // Belege das Subnetz
 						lblAusgabeStatus.setText("Ausgabe aktualisieren");
 						ausgabeAktualisieren();
 						lblAusgabeStatus.setText("Bereit");
 					} else {
+						// wenn nein, Warnung ausgeben
 						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 						warnung.setText("Kein Subnetz Verfügbar");
 						String Nachricht = "Es ist kein Subnetz mit dem Prefix "
@@ -470,6 +476,7 @@ public class VLSMGui {
 					}
 
 				} else {
+					// Warnung ausgeben, falls kein Eintrag ausgewählt
 					MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 					warnung.setText("Keine Auswahl");
 					warnung.setMessage("Sie haben keinen Eintrag in der Tabelle ausgewählt!");
@@ -489,12 +496,14 @@ public class VLSMGui {
 				if (table.getSelectionIndex() > -1) {
 					// Testen, ob ein Subnetz mit entsprechendem Prefix bereits ausgewählt wurde
 					if (Integer.parseInt(table.getItem(table.getSelectionIndex()).getText(3)) > 0) {
+						// wenn ja
 						lblAusgabeStatus.setText("Gebe Subnetz frei");
 						GrundNetzwerk.GebeSubnetzFrei(table.getSelectionIndex()); // Subnetz freigeben
 						lblAusgabeStatus.setText("Ausgabe aktualisieren");
 						ausgabeAktualisieren();
 						lblAusgabeStatus.setText("Bereit");
 					} else {
+						// wenn nein, Warnung ausgeben
 						MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 						warnung.setText("Kein Subnetz in Auswahl");
 						String Nachricht = "Sie haben kein Subnetz mit dem Prefix "
@@ -505,6 +514,7 @@ public class VLSMGui {
 					}
 
 				} else {
+					// Warnung ausgeben, falls kein Eintrag ausgewählt
 					MessageBox warnung = new MessageBox(shlVlsmAuswahl, SWT.ICON_WARNING | SWT.OK);
 					warnung.setText("Keine Auswahl");
 					warnung.setMessage("Sie haben keinen Eintrag in der Tabelle ausgewählt!");
@@ -522,7 +532,7 @@ public class VLSMGui {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				lblAusgabeStatus.setText("Berechne Ausgabe");
-				// Auswahl übertragen
+				// Auswahl übertragen / Belegung berechnen
 				AusgabeNetzwerk.AuswahlFertig(GrundNetzwerk.getNetzwerkeAusgewaehlt(),
 						GrundNetzwerk.getNetzwerkeVerfuegbar());
 				// Ausgabe öffnen
@@ -530,7 +540,7 @@ public class VLSMGui {
 						AusgabeNetzwerk.getFreieSubnetze(), AusgabeNetzwerk.getNetzwerkAddrDD(),
 						AusgabeNetzwerk.getPrefix());
 				lblAusgabeStatus.setText("Ausgabe geöffnet");
-				Ausgabe.open();
+				Ausgabe.open(shlVlsmAuswahl);
 				lblAusgabeStatus.setText("Bereit");
 			}
 
@@ -611,19 +621,19 @@ public class VLSMGui {
 	// dezimale Zahl um
 	private long UplinkEingabeIP(int okt1, int okt2, int okt3, int okt4) {
 		String IPAddrBin = "";
-		// Erstes Oktett zur Binären IP-Adresse hinzufügen
+		// Erstes Oktett zur binären IP-Adresse hinzufügen
 		String OktBin = LongToBin(okt1);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
-		// Zweites Oktett zur Binären IP-Adresse hinzufügen
+		// Zweites Oktett zur binären IP-Adresse hinzufügen
 		OktBin = LongToBin(okt2);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
-		// Drittes Oktett zur Binären IP-Adresse hinzufügen
+		// Drittes Oktett zur binären IP-Adresse hinzufügen
 		OktBin = LongToBin(okt3);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
-		// Viertes Oktett zur Binären IP-Adresse hinzufügen
+		// Viertes Oktett zur binären IP-Adresse hinzufügen
 		OktBin = LongToBin(okt4);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 

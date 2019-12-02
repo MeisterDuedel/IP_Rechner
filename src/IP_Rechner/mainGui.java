@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/* Hauptfenster */
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
@@ -59,11 +59,12 @@ public class mainGui {
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
-		shlIpRechner = new Shell();
+		shlIpRechner = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shlIpRechner.setImage(SWTResourceManager.getImage(mainGui.class, "/Icons/IP_Rechner.ico"));
 		shlIpRechner.setSize(450, 220);
 		shlIpRechner.setText("IP Rechner");
-		shlIpRechner.addListener(SWT.Close, new Listener() { // Alle noch offenen Fenster schlieﬂen
+		shlIpRechner.addListener(SWT.Close, new Listener() {
+			// Schlieﬂe alle noch offenen Fenster, wenn das Programm geschlossen wird
 
 			@Override
 			public void handleEvent(Event arg0) {

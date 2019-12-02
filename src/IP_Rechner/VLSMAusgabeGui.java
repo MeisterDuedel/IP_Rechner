@@ -1,11 +1,10 @@
 package IP_Rechner;
-
+/*Ausgabefenster für VLSM*/
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
-
 import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
@@ -40,9 +39,11 @@ public class VLSMAusgabeGui {
 	/**
 	 * Open the window.
 	 */
-	public void open() {
+	// Die Parent-Shell (das VLSM-Asuwahlfenster) soll mit übergeben werden, damit
+	// sie gesperrt werden kann
+	public void open(Shell parent) {
 		Display display = Display.getDefault();
-		createContents();
+		createContents(parent);
 		shlVlsmAusgabe.open();
 		shlVlsmAusgabe.layout();
 		while (!shlVlsmAusgabe.isDisposed()) {
@@ -57,8 +58,13 @@ public class VLSMAusgabeGui {
 	 * 
 	 * @wbp.parser.entryPoint
 	 */
-	protected void createContents() {
-		shlVlsmAusgabe = new Shell();
+	protected void createContents(Shell parent) {
+		/*
+		 * SWT.PRIMARY_MODAL: Die Parent-Shell (in diesem Fall das VLSM-Auswahlfenster
+		 * VLSMGui) wird gesperrt. mainGui, NetzwerkinfosGui, SubnetzPrefixGui und
+		 * AnzHostsPrefixGui können weiterhin genutz werden.
+		 */
+		shlVlsmAusgabe = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.PRIMARY_MODAL);
 		shlVlsmAusgabe.setImage(SWTResourceManager.getImage(VLSMAusgabeGui.class, "/Icons/IP_Rechner.ico"));
 		shlVlsmAusgabe.setSize(934, 669);
 		shlVlsmAusgabe.setText("VLSM Ausgabe");
@@ -165,8 +171,7 @@ public class VLSMAusgabeGui {
 		btnHTML.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
-				// DIalog zum Auswählen des Dateipfads
+				// Dialog zum Auswählen des Dateipfads
 				FileDialog waehlePfad = new FileDialog(shlVlsmAusgabe, SWT.SAVE);
 				waehlePfad.setFilterNames(new String[] { ".html" });
 				waehlePfad.setFilterExtensions(new String[] { ".html" }); // erlaubte Dateiendung
@@ -237,4 +242,5 @@ public class VLSMAusgabeGui {
 		}
 		return Zahl;
 	}
+
 }

@@ -1,38 +1,40 @@
 package IP_Rechner;
-
+/*Klasse zur Speicherung und Berechnug von Netzwerkinformationen*/
 public class Netzwerk {
 
 	private long Netzwerkaddr;
 	private int Prefix;
+	// Auf weitere Attribute habe ich aus Speicherplatzgründen verzichtet
 
-	// Konstruktor für VLSM
+	// Konstruktor für Subnetze (VLSM)
 	public Netzwerk(long Adresse, int Prefix) {
 		Netzwerkaddr = Adresse;
 		this.Prefix = Prefix;
 	}
 
-	// Konstruktor für Netzwerkinfos
+	// Konstruktor für Netzwerkinfos bzw. Ausgabe-Netzwerk (VLSM)
 	public Netzwerk(int okt1, int okt2, int okt3, int okt4, int Prefix) {
 		this.Prefix = Prefix;
 		String IPAddrBin = "";
-		// Erstes Oktett zur Binären IP-Adresse hinzufügen
+		// Erstes Oktett zur binären IP-Adresse hinzufügen
 		String OktBin = LongToBin(okt1, false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
-		// Zweites Oktett zur Binären IP-Adresse hinzufügen
+		// Zweites Oktett zur binären IP-Adresse hinzufügen
 		OktBin = LongToBin(okt2, false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
-		// Drittes Oktett zur Binären IP-Adresse hinzufügen
+		// Drittes Oktett zur binären IP-Adresse hinzufügen
 		OktBin = LongToBin(okt3, false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
-		// Viertes Oktett zur Binären IP-Adresse hinzufügen
+		// Viertes Oktett zur binären IP-Adresse hinzufügen
 		OktBin = LongToBin(okt4, false);
 		IPAddrBin = IPAddrBin.concat(OktBin);
 
 		String NetzwerkAddrBin = "";
 
+		// Berechne Netzwerk-Adresse aus eingegebener IP-Adresse und Prefix
 		for (int i = 0; i < Prefix; ++i) {
 			NetzwerkAddrBin = NetzwerkAddrBin.concat(IPAddrBin.substring(i, i + 1));
 		}
@@ -75,10 +77,11 @@ public class Netzwerk {
 		return Zahl;
 	}
 
-	// Wandelt eine Binäre Adresse in dotted-decimal um
+	// Wandelt eine binäre Adresse in dotted-decimal um
 	protected String BinToAddr(String Binaer) {
 		String Adresse = "";
 		for (int i = 1; i <= 4; ++i) {
+			// Aus der Binären Adresse wird der Teil des i-ten Oktetts geholt
 			long okt = BinToLong(Binaer.substring((i * 8) - 8, i * 8));
 			Adresse = Adresse.concat(Long.toString(okt));
 			if (i < 4) {
@@ -103,7 +106,6 @@ public class Netzwerk {
 	// Berechnet die Dotted Decimal Form der Netzwerkadresse und gibt diese Zurück
 	public String getNetzwerkAddrDD() {
 		String NetzwerkAddrBin = LongToBin(Netzwerkaddr, true);
-
 		String NetzwerkaddrDD = BinToAddr(NetzwerkAddrBin);
 		return NetzwerkaddrDD;
 	}
@@ -117,7 +119,6 @@ public class Netzwerk {
 	// Berechnet die Dotted Decimal Form der Broadcastadresse und gibt diese Zurück
 	public String getBroadcastDD() {
 		String BroadcastBin = LongToBin(Netzwerkaddr + ((pot(2, 32 - Prefix)) - 1), true);
-
 		String BroadcastDD = BinToAddr(BroadcastBin);
 		return BroadcastDD;
 	}
@@ -132,7 +133,6 @@ public class Netzwerk {
 			MinHost = 0;
 		}
 		String MinHostBin = LongToBin(MinHost, true);
-
 		String MinHostDD = BinToAddr(MinHostBin);
 		return MinHostDD;
 	}
@@ -149,7 +149,6 @@ public class Netzwerk {
 		}
 
 		String MaxHostBin = LongToBin(MaxHost, true);
-
 		String MaxHostDD = BinToAddr(MaxHostBin);
 		return MaxHostDD;
 	}

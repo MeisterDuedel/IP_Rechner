@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/* Klasse zur Auswahl der Anzahl an Subnetzen pro Prefix (VLSM)*/
 public class GrundNetzwerk {
 	int Prefix;
 	// Array, in dem die Anzahl der verfügbaren Subnetze gespeichert wird.
@@ -18,19 +18,6 @@ public class GrundNetzwerk {
 			NetzwerkeAusgewaehlt[i] = 0;
 		}
 
-	}
-
-	// Funktion für Potenzrechnung mit Integern
-	private int potint(int Basis, int Exponent) {
-		int Zahl = Basis;
-		if (Exponent == 0) {
-			Zahl = 1;
-		} else {
-			for (int i = 1; i < Exponent; ++i) {
-				Zahl *= Basis;
-			}
-		}
-		return Zahl;
 	}
 
 	// Belegt ein Subnetz und aktualisiert die Verfügbarkeit der übrigen Subnetze
@@ -72,7 +59,7 @@ public class GrundNetzwerk {
 		for (int i = IndexPrefix - 1; i >= 0; --i) {
 			/*
 			 * Wenn die Anzahl an verfügbaren Subnetzen im nachfolgenden Prefix gleich 2*
-			 * die (noch) aktuelle Anzahl an möglichen Subnetzen im Prefix+1 ist
+			 * die (noch) aktuelle Anzahl an möglichen Subnetzen im Prefix +1 ist
 			 */
 			if (NetzwerkeVerfuegbar[i + 1] == 2 * (NetzwerkeVerfuegbar[i] + 1)) {
 				NetzwerkeVerfuegbar[i] += 1;
@@ -102,6 +89,19 @@ public class GrundNetzwerk {
 				NetzwerkeVerfuegbar[i] -= 1;
 			}
 		}
+	}
+
+	// Funktion für Potenzrechnung mit Integern
+	private int potint(int Basis, int Exponent) {
+		int Zahl = Basis;
+		if (Exponent == 0) {
+			Zahl = 1;
+		} else {
+			for (int i = 1; i < Exponent; ++i) {
+				Zahl *= Basis;
+			}
+		}
+		return Zahl;
 	}
 
 	public int[] getNetzwerkeVerfuegbar() {

@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/*Gui zur Berechnung von Netzwerkinformationen zu einer vom Benutzer eingegebenen IP-Adresse und Prefix*/
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
@@ -50,7 +50,7 @@ public class NetzwerkinfosGui {
 	 * @wbp.parser.entryPoint
 	 */
 	protected void createContents() {
-		shlNetzwerkinformationenBerechnen = new Shell();
+		shlNetzwerkinformationenBerechnen = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shlNetzwerkinformationenBerechnen
 				.setImage(SWTResourceManager.getImage(NetzwerkinfosGui.class, "/Icons/IP_Rechner.ico"));
 		shlNetzwerkinformationenBerechnen.setSize(485, 312);
@@ -112,6 +112,7 @@ public class NetzwerkinfosGui {
 		btnBerechne.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				// Füge Oktette für die Ausgabe zusammen
 				String IPAdresse = "";
 				IPAdresse = IPAdresse.concat(Integer.toString(okt1.getSelection()));
 				IPAdresse = IPAdresse.concat(".");
@@ -121,8 +122,10 @@ public class NetzwerkinfosGui {
 				IPAdresse = IPAdresse.concat(".");
 				IPAdresse = IPAdresse.concat(Integer.toString(okt4.getSelection()));
 				txtAusgabeIP.setText(IPAdresse);
+				// Erstelle Netzwerk, mit dem die Informationen berechnet werden
 				Netzwerk AusgabeNetzwerk = new Netzwerk(okt1.getSelection(), okt2.getSelection(), okt3.getSelection(),
 						okt4.getSelection(), prefix.getSelection());
+				// Informationen ausgeben
 				txtAusgabeNetzwerk.setText(AusgabeNetzwerk.getNetzwerkAddrDD());
 				String SubnetzmaskePrefix = AusgabeNetzwerk.getSubnetzmaskeDD();
 				SubnetzmaskePrefix = SubnetzmaskePrefix.concat(", /");

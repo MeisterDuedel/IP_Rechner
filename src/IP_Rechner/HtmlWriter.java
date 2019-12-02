@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/* Klasse zum Schreiben der HTML-Datei (VLSM)*/
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -55,7 +55,7 @@ public class HtmlWriter {
 					+ "<tr><th>Netzwerk-Adresse</th><th>Subnetzmaske</th><th>Prefix</th><th>Broadcast-Adresse</th>"
 					+ "<th>Kleinste Host-Adresse</th><th>Gr&ouml;&szlig;te Host-Adresse</th><th>Anzahl m&ouml;glicher Hosts</th></tr>");
 
-			// Schreibe Belegte Subnetze
+			// Schreibe belegte Subnetze
 			for (int i = 0; i < Subnetze.size(); ++i) {
 				for (int k = 0; k < Subnetze.get(i).size(); ++k) {
 					writer.print("<tr>");
@@ -78,7 +78,7 @@ public class HtmlWriter {
 						+ "<table>\r\n<tr><th>Netzwerk-Adresse</th><th>Subnetzmaske</th><th>Prefix</th>"
 						+ "<th>Broadcast-Adresse</th><th>Kleinste Host-Adresse</th><th>Gr&ouml;&szlig;te Host-Adresse</th><th>Anzahl m&ouml;glicher Hosts</th></tr>");
 
-				// Schreibe Freie Subnetze
+				// Schreibe freie Subnetze
 				for (int i = 0; i < FreieSubnetze.size(); ++i) {
 					writer.print("<tr>");
 					writer.print("<td>" + FreieSubnetze.get(i).getNetzwerkAddrDD() + "</td>");

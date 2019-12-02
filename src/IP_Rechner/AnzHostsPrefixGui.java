@@ -1,5 +1,5 @@
 package IP_Rechner;
-
+/*Gui zur Berechnung des passenden Prefixes zu einer vom Benutzer eingegebenen Anzahl an Hosts*/
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
@@ -17,7 +17,7 @@ public class AnzHostsPrefixGui {
 
 	protected Shell shlAnzahlHostsZu;
 	private Text AnzahlHosts; // Spinner kann nur bis ca. 2.1 Mrd. Ich brauche aber 4,3 Mrd. Zudem ist die
-								// Darstellung bei Zahlen über 999 kaputt
+								// Darstellung bei Zahlen ab 10000 kaputt
 	private Text txtAusgPrefix;
 	private boolean offen;
 
@@ -47,7 +47,7 @@ public class AnzHostsPrefixGui {
 	 * @wbp.parser.entryPoint
 	 */
 	protected void createContents() {
-		shlAnzahlHostsZu = new Shell();
+		shlAnzahlHostsZu = new Shell(SWT.CLOSE | SWT.TITLE | SWT.MIN);
 		shlAnzahlHostsZu.setImage(SWTResourceManager.getImage(AnzHostsPrefixGui.class, "/Icons/IP_Rechner.ico"));
 		shlAnzahlHostsZu.setSize(399, 169);
 		shlAnzahlHostsZu.setText("Anzahl Hosts zu Prefix");
@@ -75,19 +75,23 @@ public class AnzHostsPrefixGui {
 		btnBerechne.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				// Testen, ob Eingabe in Ordnung ist
 				if (!eingabePruefen(AnzahlHosts.getText())) {
+					// Wenn nicht, Warnung ausgeben
 					MessageBox warnung = new MessageBox(shlAnzahlHostsZu, SWT.ICON_WARNING | SWT.OK);
 					warnung.setText("Fehlerhafte Eingabe");
 					warnung.setMessage("Die Eingabe muss eine Zahl zwischen 1 und 4294967294 sein!");
 					warnung.open();
 				} else {
-					// Prefix berechnen
+					// Wenn ja, Prefix berechnen
 					int Prefix;
 					long AnzHosts = Long.parseLong(AnzahlHosts.getText());
-					if (AnzHosts <= 2) { // Mindestens /30
+					if (AnzHosts <= 2) { // Kleiner als /30 macht keinen Sinn
 						Prefix = 30;
 					} else {
+						// Finde richtigen Prefix
 						int i = 3;
+						// Netzwerkadresse und Broadcastadresse werden abgezogen
 						while (i < 32 && pot(2, i) - 2 < AnzHosts) {
 							++i;
 						}
@@ -132,11 +136,14 @@ public class AnzHostsPrefixGui {
 	private boolean eingabePruefen(String AnzahlHosts) {
 		long dummy;
 		try {
+			// Teste, ob Eingabe eine Zahl ist
 			dummy = Long.parseLong(AnzahlHosts);
 		} catch (Exception e) {
 			return false;
 		}
 
+		// Teste, ob Zahl zwischen 1 und 4294967294 liegt
+		// 4294967294 kann nicht direkt zugewiesen werden
 		long maxAnzahl = pot(2, 32) - 2;
 		if (dummy < 1 || dummy > maxAnzahl) {
 			return false;
@@ -168,7 +175,7 @@ public class AnzHostsPrefixGui {
 		return Zahl;
 	}
 
-	// Wandelt eine Binäre Adresse in dotted-decimal um
+	// Wandelt eine binäre Adresse in dotted-decimal um
 	private String BinToAddr(String Binaer) {
 		String Adresse = "";
 		for (int i = 1; i <= 4; ++i) {
