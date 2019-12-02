@@ -118,8 +118,8 @@ public class VLSMAusgabeGui {
 		tblclmnAnzahlMoeglicherHostsSub.setText("Anzahl m\u00F6glicher Hosts");
 
 		Label lblUnbelegteNetzwerke = new Label(shlVlsmAusgabe, SWT.NONE);
-		lblUnbelegteNetzwerke.setBounds(10, 409, 148, 21);
-		lblUnbelegteNetzwerke.setText("Unbelegte Netzwerke:");
+		lblUnbelegteNetzwerke.setBounds(10, 409, 249, 21);
+		lblUnbelegteNetzwerke.setText("Freie Netzwerke (Zusammengefasst):");
 
 		tableUnbelegt = new Table(shlVlsmAusgabe, SWT.BORDER | SWT.FULL_SELECTION);
 		tableUnbelegt.setLinesVisible(true);
@@ -174,12 +174,12 @@ public class VLSMAusgabeGui {
 				waehlePfad.setFileName("VLSM.html"); // Default-Name
 				waehlePfad.setOverwrite(true); // Überschreiben muss bestätigt werden
 				String Pfad = waehlePfad.open(); // Dialog öffnen
-				if (Pfad != null) { //Wenn der Benutzer nicht "Abbrechen" gedrückt hat
+				if (Pfad != null) { // Wenn der Benutzer nicht "Abbrechen" gedrückt hat
 					HtmlWriter HTML = new HtmlWriter(Pfad, Subnetze, FreieSubnetze, NetzwerkadresseGrundnetzwerk,
 							PrefixGrundnetzwerk);
-					
+
 					if (!HTML.schreibe()) { // Schreiben (und prüfen, ob es geklappt hat)
-						//Fehlermeldung, falls schreiben nicht geklappt hat
+						// Fehlermeldung, falls schreiben nicht geklappt hat
 						MessageBox fehlermeldung = new MessageBox(shlVlsmAusgabe, SWT.ICON_ERROR | SWT.OK);
 						fehlermeldung.setText("Datei konnte nicht geschrieben werden!");
 						fehlermeldung.setMessage("Datei konnte nicht geschrieben werden!");

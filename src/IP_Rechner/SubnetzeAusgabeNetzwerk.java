@@ -55,7 +55,6 @@ public class SubnetzeAusgabeNetzwerk extends Netzwerk {
 		}
 	}
 
-	
 	// Findet das erste freie Subnetz zu einem Prefix
 	private int FindeFreiesNetzwerk(int IndexPrefix) {
 		int i = 0;

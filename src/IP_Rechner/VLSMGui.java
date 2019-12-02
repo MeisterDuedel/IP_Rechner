@@ -202,20 +202,20 @@ public class VLSMGui {
 
 		lblPrefixUplink = new Label(shlVlsmAuswahl, SWT.NONE);
 		lblPrefixUplink.setEnabled(false);
-		lblPrefixUplink.setBounds(330, 91, 209, 21);
-		lblPrefixUplink.setText("Prefix (8=finde kleinstm\u00F6glich):");
+		lblPrefixUplink.setBounds(330, 91, 204, 21);
+		lblPrefixUplink.setText("Prefix (8=finde kleinste Gr\u00F6\u00DFe):");
 
 		UplinkPrefix = new Spinner(shlVlsmAuswahl, SWT.BORDER);
 		UplinkPrefix.setEnabled(false);
 		UplinkPrefix.setMaximum(30);
 		UplinkPrefix.setMinimum(8);
 		UplinkPrefix.setSelection(8);
-		UplinkPrefix.setBounds(541, 91, 47, 24);
+		UplinkPrefix.setBounds(540, 91, 47, 24);
 
 		btnUplinkDefinitivHost = new Button(shlVlsmAuswahl, SWT.CHECK);
 		btnUplinkDefinitivHost.setEnabled(false);
-		btnUplinkDefinitivHost.setBounds(81, 121, 309, 21);
-		btnUplinkDefinitivHost.setText("Adresse ist DEFINITIV eine Host-IP-Adresse");
+		btnUplinkDefinitivHost.setBounds(81, 121, 484, 21);
+		btnUplinkDefinitivHost.setText("DEFINITIV eine Host-IP-Adresse (keine Netzwerk-/Broadcast-Adresse)");
 
 		Button btnBerechneSubnetze = new Button(shlVlsmAuswahl, SWT.NONE);
 		btnBerechneSubnetze.addSelectionListener(new SelectionAdapter() {

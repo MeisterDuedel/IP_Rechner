@@ -73,7 +73,7 @@ public class HtmlWriter {
 			writer.println("</table><br>");
 
 			if (FreieSubnetze.size() > 0) {
-				//Nur, wenn noch freie Subnetze existieren
+				// Nur, wenn noch freie Subnetze existieren
 				writer.println("Freie Subnetze (Zusammengefasst):\r\n"
 						+ "<table>\r\n<tr><th>Netzwerk-Adresse</th><th>Subnetzmaske</th><th>Prefix</th>"
 						+ "<th>Broadcast-Adresse</th><th>Kleinste Host-Adresse</th><th>Gr&ouml;&szlig;te Host-Adresse</th><th>Anzahl m&ouml;glicher Hosts</th></tr>");
