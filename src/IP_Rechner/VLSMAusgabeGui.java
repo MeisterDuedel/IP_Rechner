@@ -4,6 +4,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+
 import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
@@ -163,12 +165,27 @@ public class VLSMAusgabeGui {
 		btnHTML.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+
+				// DIalog zum Auswählen des Dateipfads
 				FileDialog waehlePfad = new FileDialog(shlVlsmAusgabe, SWT.SAVE);
-				waehlePfad.setFilterNames(new String[] {"HTML"});
-				waehlePfad.setFilterExtensions(new String[] {".html"});
-				waehlePfad.setFilterPath(System.getProperty("user.home"));
-				System.out.println(waehlePfad.open());
+				waehlePfad.setFilterNames(new String[] { ".html" });
+				waehlePfad.setFilterExtensions(new String[] { ".html" }); // erlaubte Dateiendung
+				waehlePfad.setFilterPath(System.getProperty("user.home")); // Default-Pfad
+				waehlePfad.setFileName("VLSM.html"); // Default-Name
+				waehlePfad.setOverwrite(true); // Überschreiben muss bestätigt werden
+				String Pfad = waehlePfad.open(); // Dialog öffnen
+				if (Pfad != null) { //Wenn der Benutzer nicht "Abbrechen" gedrückt hat
+					HtmlWriter HTML = new HtmlWriter(Pfad, Subnetze, FreieSubnetze, NetzwerkadresseGrundnetzwerk,
+							PrefixGrundnetzwerk);
+					
+					if (!HTML.schreibe()) { // Schreiben (und prüfen, ob es geklappt hat)
+						//Fehlermeldung, falls schreiben nicht geklappt hat
+						MessageBox fehlermeldung = new MessageBox(shlVlsmAusgabe, SWT.ICON_ERROR | SWT.OK);
+						fehlermeldung.setText("Datei konnte nicht geschrieben werden!");
+						fehlermeldung.setMessage("Datei konnte nicht geschrieben werden!");
+						fehlermeldung.open();
+					}
+				}
 			}
 		});
 		btnHTML.setBounds(30, 584, 859, 26);
