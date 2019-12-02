@@ -26,10 +26,10 @@ public class HtmlWriter {
 
 			// Schreibe Kopf
 			writer.print(
-					"<!DOCTYPE HTML>\n<!--HTML-Ausgabe VLSM Subnetting (generiert durch IP_Rechner)\nGeneriert am: ");
+					"<!DOCTYPE HTML>\r\n<!--HTML-Ausgabe VLSM Subnetting (generiert durch IP_Rechner)\r\nGeneriert am: ");
 			writer.println(new java.util.Date());
 			writer.println(
-					"Template zuletzt geändert: 29.11.2019\nTemplate erstellt: 29.11.2019\nTemplate Autor: Christoph Pircher-->");
+					"Template zuletzt geaendert: 29.11.2019\nTemplate erstellt: 29.11.2019\nTemplate Autor: Christoph Pircher-->");
 
 			// Schreibe HTML File bis zur Ersten Tabelle (Netzwerkadresse und Prefix vom
 			// Grundnetzwerk werden eingefügt!)
@@ -47,10 +47,10 @@ public class HtmlWriter {
 					+ "</head>\r\n" + "<body>\r\n" + "<h2>VLSM Subnetting</h2>\r\n" + "<b>Netzwerkadresse: </b>");
 			writer.print(NetzwerkadresseGrundnetzwerk); // Netzwerkadresse des Grundnetzwerks einfügen
 			writer.print("<b> Prefix: </b>");
-			writer.print(PrefixGrundnetzwerk); // Prefix des Grundnetzwerks einfügen
+			writer.println(PrefixGrundnetzwerk); // Prefix des Grundnetzwerks einfügen
 			writer.println("<br><br>Belegte Subnetze:\r\n" + "<table>\r\n"
 					+ "<tr><th>Netzwerk-Adresse</th><th>Subnetzmaske</th><th>Prefix</th><th>Broadcast-Adresse</th>"
-					+ "<th>Kleinste Host-Adresse</th><th>Größte Host-Adresse</th><th>Anzahl möglicher Hosts</th></tr>");
+					+ "<th>Kleinste Host-Adresse</th><th>Gr&ouml;&szlig;te Host-Adresse</th><th>Anzahl m&ouml;glicher Hosts</th></tr>");
 
 			// Schreibe Belegte Subnetze
 			for (int i = 0; i < Subnetze.size(); ++i) {
@@ -67,7 +67,8 @@ public class HtmlWriter {
 				writer.println("</tr>");
 			}
 
-			writer.print("</table><br>\r\n" + "Freie Subnetze (Zusammengefasst):\r\n" + "<table>");
+			writer.println("</table><br>\r\n" + "Freie Subnetze (Zusammengefasst):\r\n" + "<table><tr><th>Netzwerk-Adresse</th><th>Subnetzmaske</th><th>Prefix</th>"
+			+"<th>Broadcast-Adresse</th><th>Kleinste Host-Adresse</th><th>Gr&ouml;&szlig;te Host-Adresse</th><th>Anzahl m&ouml;glicher Hosts</th></tr>");
 
 			// Schreibe Freie Subnetze
 			for (int i = 0; i < FreieSubnetze.size(); ++i) {

@@ -4,15 +4,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.widgets.Label;
-
 import java.util.ArrayList;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.FileDialog;
 
 public class VLSMAusgabeGui {
 
@@ -159,6 +160,17 @@ public class VLSMAusgabeGui {
 		tableclmnManzahlMoeglicherHostsUnb.setResizable(false);
 
 		Button btnHTML = new Button(shlVlsmAusgabe, SWT.NONE);
+		btnHTML.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				FileDialog waehlePfad = new FileDialog(shlVlsmAusgabe, SWT.SAVE);
+				waehlePfad.setFilterNames(new String[] {"HTML"});
+				waehlePfad.setFilterExtensions(new String[] {".html"});
+				waehlePfad.setFilterPath(System.getProperty("user.home"));
+				System.out.println(waehlePfad.open());
+			}
+		});
 		btnHTML.setBounds(30, 584, 859, 26);
 		btnHTML.setText("Als HTML Speichern");
 
