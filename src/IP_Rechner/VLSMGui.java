@@ -1,4 +1,5 @@
 package IP_Rechner;
+
 /*Auswahlfenster für VLSM*/
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -463,7 +464,7 @@ public class VLSMGui {
 						lblAusgabeStatus.setText("Belege Subnetz");
 						GrundNetzwerk.BelegeSubnetz(table.getSelectionIndex()); // Belege das Subnetz
 						lblAusgabeStatus.setText("Ausgabe aktualisieren");
-						ausgabeAktualisieren();
+						ausgabeAktualisierenAnzahl();
 						lblAusgabeStatus.setText("Bereit");
 					} else {
 						// wenn nein, Warnung ausgeben
@@ -500,7 +501,7 @@ public class VLSMGui {
 						lblAusgabeStatus.setText("Gebe Subnetz frei");
 						GrundNetzwerk.GebeSubnetzFrei(table.getSelectionIndex()); // Subnetz freigeben
 						lblAusgabeStatus.setText("Ausgabe aktualisieren");
-						ausgabeAktualisieren();
+						ausgabeAktualisierenAnzahl();
 						lblAusgabeStatus.setText("Bereit");
 					} else {
 						// wenn nein, Warnung ausgeben
@@ -559,7 +560,7 @@ public class VLSMGui {
 	}
 
 	// Aktualisiert die Tabelle
-	public void ausgabeAktualisieren() {
+	private void ausgabeAktualisieren() {
 		// Array für die Anzahl an verfügbaren Subnetzen pro Prefix
 		int[] AnzVerfuegbar = GrundNetzwerk.getNetzwerkeVerfuegbar();
 		// Array für die Anzahl an ausgewählten Subnetzen pro Prefix
@@ -577,6 +578,20 @@ public class VLSMGui {
 			eintrag.setText(3, Integer.toString(AnzAusgewaehlt[i])); // Anzahl Ausgewählt
 		}
 
+	}
+
+	// Aktualisiert nur die Anzahl der verfügbaren/ausgwählten Subnetze in der
+	// Tabelle
+	private void ausgabeAktualisierenAnzahl() {
+		// Array für die Anzahl an verfügbaren Subnetzen pro Prefix
+		int[] AnzVerfuegbar = GrundNetzwerk.getNetzwerkeVerfuegbar();
+		// Array für die Anzahl an ausgewählten Subnetzen pro Prefix
+		int[] AnzAusgewaehlt = GrundNetzwerk.getNetzwerkeAusgewaehlt();
+
+		for (int i = 0; i < AnzVerfuegbar.length; ++i) {
+			table.getItem(i).setText(2, Integer.toString(AnzVerfuegbar[i]));
+			table.getItem(i).setText(3, Integer.toString(AnzAusgewaehlt[i]));
+		}
 	}
 
 	// Funktion für Potenzrechnung
